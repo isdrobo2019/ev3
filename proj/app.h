@@ -3,7 +3,8 @@ extern "C" {
 #endif
 
 #include "ev3api.h"
-
+	
+	
 #define MAIN_PRIORITY    TMIN_APP_TPRI + 1
 #define TRACER_PRIORITY  TMIN_APP_TPRI + 2
 
@@ -18,9 +19,12 @@ extern void tracer_task(intptr_t exinf);
 extern void tracer_cyc(intptr_t exinf);
 
 extern int advanceN(float distance);
-	
+
 #endif /* TOPPERS_MACRO_ONLY */
 
 #ifdef __cplusplus
+
+	
+#include "ColorSensor.h"
 }
 #endif
