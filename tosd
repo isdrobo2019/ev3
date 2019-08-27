@@ -1,1 +1,1 @@
-cp ./app /cygdrive/d/ev3rt/apps/app_proj
+cp -p ./app /cygdrive/d/ev3rt/apps/appsuehara
