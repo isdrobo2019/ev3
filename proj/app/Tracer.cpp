@@ -8,12 +8,12 @@ Tracer::Tracer():
 void Tracer::init(char course) {
 	
 	select = course;
-	init_f("Tracer");
+	// init_f("Tracer");
 }
 
 // tag::tracer_impl[]
 void Tracer::terminate() {
-  msg_f("Stopped.", 4);
+//   msg_f("Stopped.", 4);
   leftWheel.stop();
   rightWheel.stop();
 }
@@ -30,7 +30,7 @@ void Tracer::run(int target, int mode) {
 	float	integral = 0;
 	
 	if(mode <= sizeof(deltaP) / sizeof(int)) {
-//P‚ÆD‚Ì’l‚Í‚±‚Ì‚Ü‚Ü‚Å“®ì‚µ‚Ü‚µ‚½B
+//Pï¿½ï¿½Dï¿½Ì’lï¿½Í‚ï¿½ï¿½Ì‚Ü‚Ü‚Å“ï¿½ï¿½ì‚µï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B
 		Kp = deltaP[mode];
 //		Ki = deltaI[mode];
 		Kd = deltaD[mode];

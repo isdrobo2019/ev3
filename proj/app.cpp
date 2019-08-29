@@ -11,22 +11,35 @@ using namespace ev3api;
 
 #include "const.h"
 
+#include "app/calibration.h"
+
 Tracer tracer;                  // Tracerのインスタンスを作成
 ColorSensor colorSensor(PORT_2);
 
 Motor leftWheel(PORT_C);
 Motor rightWheel(PORT_B);
 
+// リフレクトセンサ・白
 int light_white = 0;
+
+// リフレクトセンサ・黒
 int light_black = 0;
+
+// リフレクトセンサ・中間
 int light_target = 0;
 int first_target = 0;
 
 float cm[15] = {55, 75, 50, 80, 90, 95, 115, 80, 80, 20, 170, 60, 140, 70, 10};
 
 int mode = 0;
+
+// カラーセンサ・白
 rgb_raw_t stageWhite;
+
+// カラーセンサ・ステージ
 rgb_raw_t stageColor;
+
+// カラーセンサ補正倍率
 double rgbCoef[3];
 int flg = 1;
 
@@ -90,6 +103,7 @@ void main_task(intptr_t unused) {
 	
 	char course = '\0';
 
+    // ステージセレクト
 	while(1){
 		//左ボタンを押下
 		if (ev3_button_is_pressed(LEFT_BUTTON)){
@@ -120,117 +134,9 @@ void main_task(intptr_t unused) {
 	
 	tracer.init(course);
 	
-	//キャリブレーション
-	while(0) {
+  // カラーキャリブレーション
+	colorCalibration(stageWhite, light_black, light_white, light_target, rgbCoef);
 
-		if (touchSensor.isPressed() == true && light_black == 0) {
-			
-			snprintf(str,64,"black:         ");
-	 		ev3_lcd_draw_string(str,0,30);
-			
-			ev3_speaker_play_tone(100,30);
-			light_black = colorSensor.getBrightness();
-			snprintf(str,64,"black:[%d]",light_black);
-			ev3_lcd_draw_string(str,0,30);
-			clock.sleep(500);
-		}
-		if (touchSensor.isPressed() == true && (light_white == 0 && light_black != 0)) {
-			ev3_speaker_play_tone(100,30);
-			
-			light_white = colorSensor.getBrightness();
-			light_target = (light_black + light_white) / 2;
-			
-			snprintf(str,64,"white:[%d]",light_white);
-			ev3_lcd_draw_string(str,0,60);
-			snprintf(str,64,"target:[%d]",light_target);
-			ev3_lcd_draw_string(str,0,90);
-			clock.sleep(500);
-		}
-		// 左ボタンを長押し、それを捕捉する
-		if (ev3_button_is_pressed(LEFT_BUTTON)) {
-			light_black = 0;
-			light_white = 0;
-			snprintf(str,64,"black:         ");
-	 		ev3_lcd_draw_string(str,0,30);
-			snprintf(str,64,"white:         ");
-			ev3_lcd_draw_string(str,0,60);
-			snprintf(str,64,"target:         ");
-			ev3_lcd_draw_string(str,0,90);
-		}
-		
-		// タッチセンサーを押すと走行を開始する
-		if (touchSensor.isPressed() == true && (light_white != 0 && light_black != 0)) {
-			
-			first_target = colorSensor.getBrightness();
-		 	break;
-		}
-	}
-  int calibrationMode = 0;
-  light_black = -1;
-  light_white = -1;
-  light_target = -1;
-  stageWhite.r = 0;
-  stageWhite.g = 0;
-  stageWhite.b = 0;
-  while(1){
-    if (touchSensor.isPressed()) {
-      switch(calibrationMode) {
-        case 0:
-          ev3_speaker_play_tone(100,30);
-    			light_black = colorSensor.getBrightness();
-    			clock.sleep(500);
-        break;      
-        case 1:
-          ev3_speaker_play_tone(100,30);
-    			light_white = colorSensor.getBrightness();
-    			light_target = (light_black + light_white) / 2;
-    			clock.sleep(500);
-        break;      
-        case 2:
-          ev3_speaker_play_tone(100,30);
-    			colorSensor.getRawColor(stageWhite);
-				normalizeRGB(stageWhite, rgbCoef);
-    			clock.sleep(500);
-        break;      
-      }
-      calibrationMode++;
-    }
-    if(calibrationMode == 4) break;
-    if (ev3_button_is_pressed(LEFT_BUTTON)) {
-      calibrationMode = 0;
-      light_black = -1;
-      light_white = -1;
-      light_target = -1;
-	  stageWhite.r = 0;
-	  stageWhite.g = 0;
-	  stageWhite.b = 0;
-    }
-	switch(calibrationMode) {
-		case 1:
-			snprintf(str,64,"black :[%d]",light_black);
-			ev3_lcd_draw_string(str,0,10);
-		case 2:
-			snprintf(str,64,"white :[%d]",light_white);
-			ev3_lcd_draw_string(str,0,20);
-			snprintf(str,64,"target:[%d]",light_target);
-			ev3_lcd_draw_string(str,0,30);
-		case 3:
-			snprintf(str,64,"r     :[%u]",stageWhite.r);
-			ev3_lcd_draw_string(str,0,40);
-			snprintf(str,64,"g     :[%u]",stageWhite.g);
-			ev3_lcd_draw_string(str,0,50);
-			snprintf(str,64,"b     :[%u]",stageWhite.b);
-			ev3_lcd_draw_string(str,0,60);
-
-			snprintf(str,64,"rCoef :[%f]",rgbCoef[0]);
-			ev3_lcd_draw_string(str,0,70);
-			snprintf(str,64,"gCoef :[%f]",rgbCoef[1]);
-			ev3_lcd_draw_string(str,0,80);
-			snprintf(str,64,"bCoef :[%f]",rgbCoef[2]);
-			ev3_lcd_draw_string(str,0,90);
-			break;
-			}
-  }
 	//走行開始
 	// ev3_sta_cyc(TRACER_CYC);
 	// slp_tsk();
@@ -250,8 +156,8 @@ int myMotorPower = (Motor::PWM_MAX)/8;
   int mode = 0;
   bool change = true;
 
-	int turning[2] = {0, 2};
-	int turningLength = 2;
+	int turning[5] = {0, 1, 2, 3, 4};
+	int turningLength = 5;
 	int turningNow = 0;
 
   // 難所whileループ部分
@@ -267,14 +173,16 @@ int myMotorPower = (Motor::PWM_MAX)/8;
         case 1:
 		switch(turning[turningNow]) {
 			case 0:
+			case 1:
           leftWheel.setPWM(myMotorPower);
           rightWheel.setPWM(0);
 			break;
-			case 1:
+			case 2:
           leftWheel.setPWM(myMotorPower);
           rightWheel.setPWM(myMotorPower);
 			break;
-			case 2:
+			case 3:
+			case 4:
           leftWheel.setPWM(0);
           rightWheel.setPWM(myMotorPower);
 			break;
@@ -288,6 +196,7 @@ int myMotorPower = (Motor::PWM_MAX)/8;
       change = false;
     }
 		//if(tmpCount%500==0)ev3_speaker_play_tone(100,30);
+    int angle;
     switch(mode) {
       case 0:
 		colorSensor.getRawColor(stageColor);
@@ -310,7 +219,9 @@ int myMotorPower = (Motor::PWM_MAX)/8;
       case 1:
 	  switch(turning[turningNow]){
 		case 0:
-        if(monoWheelRotChk(90, 1) == 1) {
+		case 1:
+		angle = turning[turningNow]==0? 90: 45;
+        if(monoWheelRotChk(angle, 1) == 1) {
           ev3_speaker_play_tone(200,30);
           mode = 0;
           change = true;
@@ -326,7 +237,7 @@ int myMotorPower = (Motor::PWM_MAX)/8;
           rightWheel.setPWM(0);
         }
 		break;
-		case 1:
+		case 2:
 		if(advanceN(15.0f) == 1) {
           ev3_speaker_play_tone(200,30);
           mode = 0;
@@ -343,8 +254,11 @@ int myMotorPower = (Motor::PWM_MAX)/8;
           rightWheel.setPWM(myMotorPower);
 		}
 		break;
-		case 2:
-        if(monoWheelRotChk(90, 0) == 1) {
+		case 3:
+		case 4:
+		angle = turning[turningNow]==3? 45: 90;
+
+        if(monoWheelRotChk(angle, 0) == 1) {
           ev3_speaker_play_tone(200,30);
           mode = 0;
           change = true;

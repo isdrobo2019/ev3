@@ -6,11 +6,10 @@ Straight::Straight():
   }
 
 void Straight::init() {
-  init_f("083_sample");
 }
 
 void Straight::terminate() {
-  msg_f("Stopped.", 1);
+//   msg_f("Stopped.", 1);
   leftWheel.stop();
   rightWheel.stop();
 }
