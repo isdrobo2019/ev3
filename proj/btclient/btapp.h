@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ev3api.h"
-#include "app.h"
 #include "lcd.h"
+//#include <stderr.h>
 
-//#define DEBUG_PRINT
+#define DEBUG_PRINT
 
 #define error( fmt, ... ) \
 	lcd_print( \
@@ -13,7 +13,7 @@
 
 #ifndef DEBUG_PRINT
 #define debug( fmt, ... ) ((void)0)
-#else /* DEBUG_PRINT */
+#else // DEBUG_PRINT 
 #define debug( fmt, ... ) lcd_print( fmt, ##__VA_ARGS__ )
 #endif
 
@@ -146,7 +146,7 @@ static int decode_packet(uint8_t rescode, uint8_t *data, size_t data_len, PointC
 		}
 		for ( i = 0; i < num_of_points; i++, data_index = data_index + 3 ) {
 			l_result[i].point = ((uint16_t)data[data_index] << 8) + (uint16_t)data[data_index+1]; /* from network byte order */
-			l_result[i].color = data[data_index+2];
+			l_result[i].color = (EColor)data[data_index+2];
 		}
 	} else if ( rescode == eError ) {
 		if ( errmsg == NULL ) {
@@ -233,7 +233,9 @@ static int serial_read(FILE *bt, uint8_t *code, uint8_t **data, size_t *data_len
 	return 0;
 }
 
-void main_task(intptr_t unused)
+void end(FILE *bt, uint8_t *request, uint8_t *response, PointColor *result, char *errmsg);
+
+void btmain(intptr_t unused)
 {
 	int ret = -1;
 	FILE *bt = NULL;
@@ -253,27 +255,31 @@ void main_task(intptr_t unused)
 	lcd_print("program start.\n");
 
 	// タッチセンサを設定
-	ev3_sensor_config(TOUCH_SENSOR_PORT, TOUCH_SENSOR);
+	ev3_sensor_config((sensor_port_t)TOUCH_SENSOR_PORT, (sensor_type_t)TOUCH_SENSOR);
 
 	// Bluetooth通信を開通
 	bt = serial_open();
 	if ( bt == NULL ) {
 		error("failed to serial_open");
-		goto end;
+		//goto end;
+		end(bt, request, response, result, errmsg);
+		return;
 	}
 	lcd_print("bluetooth connected.\n");
 
 	// タッチセンサ押下待ち
 	lcd_print("Press the touch sensor.\n");
-    while(!ev3_touch_sensor_is_pressed(TOUCH_SENSOR_PORT));
-    while(ev3_touch_sensor_is_pressed(TOUCH_SENSOR_PORT));
+    while(!ev3_touch_sensor_is_pressed((sensor_port_t)TOUCH_SENSOR_PORT));
+    while(ev3_touch_sensor_is_pressed((sensor_port_t)TOUCH_SENSOR_PORT));
 
 	// 色判定リクエストメッセージを生成
 	request_len = encode_packet(eSpecific, points, sizeof(points)/sizeof(points[0]), &request); /* 座標IDを指定する場合 */
 	//request_len = encode_packet(eAll, NULL, 0, &request); /* すべての座標IDの色を取得する場合 */
 	if ( request_len == 0 ) {
 		error("failed to encode_packet");
-		goto end;
+		//goto end;
+		end(bt, request, response, result, errmsg);
+		return;
 	}
 	debug("req = ");
 	for ( i = 0; i < request_len; i++ ) {
@@ -285,14 +291,18 @@ void main_task(intptr_t unused)
 	ret = serial_write(bt, request, request_len);
 	if ( ret != 0 ) {
 		error("failed to serial_write");
-		goto end;
+		//goto end;
+		end(bt, request, response, result, errmsg);
+		return;
 	}
 
 	// 応答を受信
 	ret = serial_read(bt, &rescode, &response, &response_len);
 	if ( ret != 0 ) {
 		error("failed to serial_read");
-		goto end;
+		//goto end;
+		end(bt, request, response, result, errmsg);
+		return;
 	}
 	debug("rescode = %u\n", rescode);
 	debug("resdata = ");
@@ -305,7 +315,9 @@ void main_task(intptr_t unused)
 	ret = decode_packet(rescode, response, response_len, &result, &num_of_result, &errmsg);
 	if ( ret != 0 ) {
 		error("failed to decode_packet");
-		goto end;
+		//goto end;
+		end(bt, request, response, result, errmsg);
+		return;
 	}
 	
 	// 色判定結果をLCDへ出力
@@ -320,7 +332,10 @@ void main_task(intptr_t unused)
 		lcd_print("errmsg = %s\n", errmsg);
 	}
 
-end:
+	return;
+}
+
+void end(FILE *bt, uint8_t *request, uint8_t *response, PointColor *result, char *errmsg) {
 	if ( bt != NULL ) {
 		fclose(bt);
 		lcd_print("bluetooth disconnected.\n");
@@ -341,6 +356,4 @@ end:
 	lcd_print("program end.\n");
 	
 	term_lcd();
-
-	return;
 }

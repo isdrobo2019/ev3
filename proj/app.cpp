@@ -1,5 +1,7 @@
 // tag::tracer_def[]
 #include "app.h"
+#include "target_test.h"
+#include "btclient/btapp.h"
 #include "Tracer.h"
 #include <math.h>
 #include <stdlib.h>
@@ -160,9 +162,12 @@ int myMotorPower = (Motor::PWM_MAX)/8;
 	int turningLength = 5;
 	int turningNow = 0;
 
+  btmain(unused);
+
   // 難所whileループ部分
   while(true) {
 
+//tracer.run(50, 20);
     // モード変わったときにモータのパワーをセットする
     if(change) {
       switch(mode) {

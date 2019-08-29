@@ -23,9 +23,9 @@ void Tracer::run(int target, int mode) {
 	float	Ki = 0;
 	float	Kd = 0;
 	
-	float p = 0;
-	float i = 0;
-	float d = 0;
+	float p = 0.6;
+	float i = 0.2;
+	float d = 0.01;
 	int pwm = 25;
 	float	integral = 0;
 	
