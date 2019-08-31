@@ -1,4 +1,5 @@
 // tag::tracer_def[]
+#include "const.h"
 #include "app.h"
 #include "target_test.h"
 #include "btclient/btapp.h"
@@ -11,9 +12,9 @@
 #include "Motor.h"
 using namespace ev3api;
 
-#include "const.h"
 
 #include "app/calibration.h"
+#include "app/blockbingo.h"
 
 Tracer tracer;                  // Tracerのインスタンスを作成
 ColorSensor colorSensor(PORT_2);
@@ -38,8 +39,6 @@ int mode = 0;
 // カラーセンサ・白
 rgb_raw_t stageWhite;
 
-// カラーセンサ・ステージ
-rgb_raw_t stageColor;
 
 // カラーセンサ補正倍率
 double rgbCoef[3];
@@ -105,34 +104,7 @@ void main_task(intptr_t unused) {
 	
 	char course = '\0';
 
-    // ステージセレクト
-	while(1){
-		//左ボタンを押下
-		if (ev3_button_is_pressed(LEFT_BUTTON)){
-			course = 'L';
-			snprintf(str,64,"course:[%c]", course);
-			ev3_lcd_draw_string(str,0,30);
-			clock.sleep(500);
-		}
-		
-		//右ボタンを押下
-		if (ev3_button_is_pressed(RIGHT_BUTTON)){
-			course = 'R';
-			snprintf(str,64,"course:[%c]", course);
-			ev3_lcd_draw_string(str,0,30);
-			clock.sleep(500);
-		}
-		
-		//中央ボタンを押下
-		if (ev3_button_is_pressed(ENTER_BUTTON) && course != '\0'){
-			
-			snprintf(str,64,"select_course:[%c]", course);
-			ev3_lcd_draw_string(str,0,30);
-	
-			clock.sleep(500);
-			break;
-		}
-	}
+	stageSelect(course);
 	
 	tracer.init(course);
 	
@@ -152,139 +124,16 @@ void main_task(intptr_t unused) {
   //float constvaltest = WIDTH_RADIUS;
   // leftWheel.setPWM((Motor::PWM_MAX)/5);
   // rightWheel.setPWM((Motor::PWM_MAX)/5);
-int myMotorPower = (Motor::PWM_MAX)/8;
 
-  int tmpCount = 0;  
-  int mode = 0;
-  bool change = true;
-
-	int turning[5] = {0, 1, 2, 3, 4};
-	int turningLength = 5;
-	int turningNow = 0;
+  //int blockSetPhase = -1;
+	//int turning[5] = {0, 1, 2, 3, 4};
+	//0~5 右～左
+	int turning[3] = {0, 2, 4};
 
   btmain(unused);
 
-  // 難所whileループ部分
-  while(true) {
+	blockBingoMethod(tracer, leftWheel, rightWheel, turning, 3, light_white, light_black, rgbCoef);
 
-//tracer.run(50, 20);
-    // モード変わったときにモータのパワーをセットする
-    if(change) {
-      switch(mode) {
-        case 0:
-          leftWheel.setPWM(myMotorPower);
-          rightWheel.setPWM(myMotorPower);
-        break;
-        case 1:
-		switch(turning[turningNow]) {
-			case 0:
-			case 1:
-          leftWheel.setPWM(myMotorPower);
-          rightWheel.setPWM(0);
-			break;
-			case 2:
-          leftWheel.setPWM(myMotorPower);
-          rightWheel.setPWM(myMotorPower);
-			break;
-			case 3:
-			case 4:
-          leftWheel.setPWM(0);
-          rightWheel.setPWM(myMotorPower);
-			break;
-		}
-			snprintf(str,64,"now :[%3.2f]");
-			ev3_lcd_draw_string(str,0,10);
-          leftWheel.setCount(0);
-          rightWheel.setCount(0);
-        break;
-      }
-      change = false;
-    }
-		//if(tmpCount%500==0)ev3_speaker_play_tone(100,30);
-    int angle;
-    switch(mode) {
-      case 0:
-		colorSensor.getRawColor(stageColor);
-        if(rawColortoColorNumber(stageColor, rgbCoef) == COLOR_NONE) {
-        //if(true) {
-          ev3_speaker_play_tone(100,30);
-          mode = 1;
-          change = true;
-          leftWheel.setPWM(0);
-          rightWheel.setPWM(0);
-          while(true) {
-              if (touchSensor.isPressed() == true ){
-                break;
-              }
-          }
-          leftWheel.setPWM(myMotorPower);
-          rightWheel.setPWM(myMotorPower);
-        }
-      break;
-      case 1:
-	  switch(turning[turningNow]){
-		case 0:
-		case 1:
-		angle = turning[turningNow]==0? 90: 45;
-        if(monoWheelRotChk(angle, 1) == 1) {
-          ev3_speaker_play_tone(200,30);
-          mode = 0;
-          change = true;
-          leftWheel.setPWM(0);
-          rightWheel.setPWM(0);
-          while(true) {
-              if (touchSensor.isPressed() == true ){
-                break;
-              }
-          }
-   		  turningNow = (turningNow + 1) % turningLength;
-          leftWheel.setPWM(myMotorPower);
-          rightWheel.setPWM(0);
-        }
-		break;
-		case 2:
-		if(advanceN(15.0f) == 1) {
-          ev3_speaker_play_tone(200,30);
-          mode = 0;
-          change = true;
-          leftWheel.setPWM(0);
-          rightWheel.setPWM(0);
-          while(true) {
-              if (touchSensor.isPressed() == true ){
-                break;
-              }
-          }
-   		  turningNow = (turningNow + 1) % turningLength;
-          leftWheel.setPWM(myMotorPower);
-          rightWheel.setPWM(myMotorPower);
-		}
-		break;
-		case 3:
-		case 4:
-		angle = turning[turningNow]==3? 45: 90;
-
-        if(monoWheelRotChk(angle, 0) == 1) {
-          ev3_speaker_play_tone(200,30);
-          mode = 0;
-          change = true;
-          leftWheel.setPWM(0);
-          rightWheel.setPWM(0);
-          while(true) {
-              if (touchSensor.isPressed() == true ){
-                break;
-              }
-          }
-   		  turningNow = (turningNow + 1) % turningLength;
-          leftWheel.setPWM(0);
-          rightWheel.setPWM(myMotorPower);
-        }
-		break;
-	  }
-      break;
-    }
-    clock.sleep(4);
-    tmpCount++;
-  }
   leftWheel.setPWM(0);
   rightWheel.setPWM(0);
 	ext_tsk();
@@ -295,6 +144,10 @@ int myMotorPower = (Motor::PWM_MAX)/8;
  */
 int monoWheelRotChk(int degree, int leftRight) {
   float travel = (leftRight != 0)? leftWheel.getCount(): rightWheel.getCount();
+  			char str[64];
+			  snprintf(str,64,"degree :[%d], travel :[%3.2f]",degree, travel);
+			ev3_lcd_draw_string(str,0,10);
+
   return (travel >= (float)degree * WIDTH / WHEEL_RADIUS)? 1: 0;
 }
 
@@ -316,7 +169,7 @@ int advanceN(float distance) {
 	progress = (leftTravel + rightTravel) / 2.0f;
 	progress_ratio = progress / position;
 
-  	if(progress > position){
+  	if(labs(progress) > position){
   		return 1;
   	}
   	return 0;

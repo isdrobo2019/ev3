@@ -1,4 +1,36 @@
 
+void stageSelect(char& course) {
+	  Clock clock;
+	char str[64];
+	    // ステージセレクト
+	while(1){
+		//左ボタンを押下
+		if (ev3_button_is_pressed(LEFT_BUTTON)){
+			course = 'L';
+			snprintf(str,64,"course:[%c]", course);
+			ev3_lcd_draw_string(str,0,30);
+			clock.sleep(500);
+		}
+		
+		//右ボタンを押下
+		if (ev3_button_is_pressed(RIGHT_BUTTON)){
+			course = 'R';
+			snprintf(str,64,"course:[%c]", course);
+			ev3_lcd_draw_string(str,0,30);
+			clock.sleep(500);
+		}
+		
+		//中央ボタンを押下
+		if (ev3_button_is_pressed(ENTER_BUTTON) && course != '\0'){
+			
+			snprintf(str,64,"select_course:[%c]", course);
+			ev3_lcd_draw_string(str,0,30);
+	
+			clock.sleep(500);
+			break;
+		}
+	}
+}
 // カラーキャリブレーション
 void colorCalibration(rgb_raw_t& stageWhite, int& light_black, int& light_white, int& light_target, double* rgbCoef) {
 

@@ -2,6 +2,9 @@
 #include <math.h>
 #include <stdarg.h>
 
+#define SATURATION_THRESHOLD 50.0
+#define VALUE_THRESHOLD 50.0
+
 // 演習用のユーティリティ
 
 // 初期処理用
@@ -136,8 +139,8 @@ char str[64];
 			snprintf(str,64,"hsv :[%3.2f, %3.2f, %3.2f]",h, s, v);
 			ev3_lcd_draw_string(str,0,120);
 
-  if(s < 30.0) {
-    if(v > 50.0) {
+  if(s < SATURATION_THRESHOLD) {
+    if(v > VALUE_THRESHOLD) {
       return COLOR_WHITE;
     } else {
       return COLOR_BLACK;

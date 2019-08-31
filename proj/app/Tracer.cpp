@@ -18,15 +18,24 @@ void Tracer::terminate() {
   rightWheel.stop();
 }
 
+char Tracer::getSelect() {
+	return select;
+}
+
+void Tracer::setSelect(char select) {
+	this->select = select;
+}
+
+
 void Tracer::run(int target, int mode) {
-	float	Kp = 0;
-	float	Ki = 0;
-	float	Kd = 0;
+	float	Kp = 0.6;
+	float	Ki = 0.2;
+	float	Kd = 0.01;
 	
-	float p = 0.6;
-	float i = 0.2;
-	float d = 0.01;
-	int pwm = 25;
+	float p = 0;
+	float i = 0;
+	float d = 0;
+	int pwm = 10;
 	float	integral = 0;
 	
 	if(mode <= sizeof(deltaP) / sizeof(int)) {
