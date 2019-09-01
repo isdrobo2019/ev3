@@ -19,7 +19,7 @@ void init_lcd() {
 	ev3_lcd_set_font(EV3_FONT_SMALL);
 	ev3_font_get_size(EV3_FONT_SMALL, &width, &height);
 	MAX_LINE_NUM = EV3_LCD_HEIGHT/height;
-	buffer = calloc(1, EV3_LCD_WIDTH/width+1);
+	buffer = (char *)calloc(1, EV3_LCD_WIDTH/width+1);
 	is_initialized = 1;
 }
 

@@ -10,6 +10,8 @@ public:
 	void run(int target, int mode);
 	void init(char course);
 	void terminate();
+    char getSelect();
+    void setSelect(char select);
 
 private:
 	ColorSensor colorSensor;

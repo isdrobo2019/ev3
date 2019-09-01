@@ -19,7 +19,8 @@ extern void tracer_task(intptr_t exinf);
 extern void tracer_cyc(intptr_t exinf);
 
 extern int monoWheelRotChk(int degree, int leftRight);
-extern int advanceN(float distance);
+extern int advanceChk(float distance);
+extern int balancingAdvanceChk(float distance, int balancing, int pwm);
 
 #endif /* TOPPERS_MACRO_ONLY */
 
