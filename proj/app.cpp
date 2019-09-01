@@ -117,8 +117,8 @@ void main_task(intptr_t unused) {
 //ev3_sta_cyc(TRACER_CYC);
 
 //決め打ち
-ev3_sta_cyc(DECISEIVE_CYC);
- slp_tsk();
+//ev3_sta_cyc(DECISEIVE_CYC);
+// slp_tsk();
 	
 	// //走行終了
  ev3_stp_cyc(TRACER_CYC);
