@@ -30,13 +30,14 @@ rgb_raw_t stageColor;
 double rgbCoef[3];
 int flg = 1;
 
-void tracer_cyc(intptr_t exinf) {
-	act_tsk(TRACER_TASK);
+
+void deciseive_cyc(intptr_t exinf) {
+	//act_tsk(TRACER_TASK);
 }
 
-void tracer_task(intptr_t exinf) {
+void tracer_cyc(intptr_t exinf) {
 
-	if(advanceN(cm[mode])){
+	if(advanceChk(cm[mode])){
 		ev3_speaker_play_tone(100,30);
 	  	leftWheel.setCount(0);
 	  	rightWheel.setCount(0);
@@ -232,12 +233,16 @@ void main_task(intptr_t unused) {
 			}
   }
 	//走行開始
-	// ev3_sta_cyc(TRACER_CYC);
-	// slp_tsk();
+//ライントレース
+//ev3_sta_cyc(TRACER_CYC);
+
+//決め打ち
+ev3_sta_cyc(DECISEIVE_CYC);
+ slp_tsk();
 	
 	// //走行終了
-	// ev3_stp_cyc(TRACER_CYC);
-	// tracer.terminate();
+ ev3_stp_cyc(TRACER_CYC);
+ tracer.terminate();
 
   // ブロックビンゴ仮？
   //rgb2hsv(0,0,0);
@@ -327,7 +332,7 @@ int myMotorPower = (Motor::PWM_MAX)/8;
         }
 		break;
 		case 1:
-		if(advanceN(15.0f) == 1) {
+		if(advanceChk(15.0f) == 1) {
           ev3_speaker_play_tone(200,30);
           mode = 0;
           change = true;
@@ -379,7 +384,7 @@ int monoWheelRotChk(int degree, int leftRight) {
   return (travel >= (float)degree * WIDTH / WHEEL_RADIUS)? 1: 0;
 }
 
-int advanceN(float distance) {
+int advanceChk(float distance) {
 	
 	float radius = 5.0f;
 	float position = distance;

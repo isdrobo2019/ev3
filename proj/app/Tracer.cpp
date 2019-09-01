@@ -32,9 +32,9 @@ void Tracer::run(int target, int mode) {
 	if(mode <= sizeof(deltaP) / sizeof(int)) {
 //P‚ÆD‚Ì’l‚Í‚±‚Ì‚Ü‚Ü‚Å“®ì‚µ‚Ü‚µ‚½B
 		Kp = deltaP[mode];
-//		Ki = deltaI[mode];
+		Ki = deltaI[mode];
 		Kd = deltaD[mode];
-//		pwm = speed[mode];
+		pwm = speed[mode];
 		
 	}
 	
