@@ -44,11 +44,12 @@ rgb_raw_t stageWhite;
 double rgbCoef[3];
 int flg = 1;
 
-void tracer_cyc(intptr_t exinf) {
-	act_tsk(TRACER_TASK);
+
+void deciseive_cyc(intptr_t exinf) {
+	//act_tsk(TRACER_TASK);
 }
 
-void tracer_task(intptr_t exinf) {
+void tracer_cyc(intptr_t exinf) {
 
 	if(advanceChk(cm[mode])){
 		ev3_speaker_play_tone(100,30);
@@ -112,12 +113,16 @@ void main_task(intptr_t unused) {
 	colorCalibration(stageWhite, light_black, light_white, light_target, rgbCoef);
 
 	//走行開始
-	// ev3_sta_cyc(TRACER_CYC);
-	// slp_tsk();
+//ライントレース
+//ev3_sta_cyc(TRACER_CYC);
+
+//決め打ち
+ev3_sta_cyc(DECISEIVE_CYC);
+ slp_tsk();
 	
 	// //走行終了
-	// ev3_stp_cyc(TRACER_CYC);
-	// tracer.terminate();
+ ev3_stp_cyc(TRACER_CYC);
+ tracer.terminate();
 
   // ブロックビンゴ仮？
   //rgb2hsv(0,0,0);
