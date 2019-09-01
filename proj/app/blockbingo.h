@@ -54,6 +54,32 @@ rgb_raw_t stageColor;
           rightWheel.setCount(0);
         break;
 		case 2:
+          leftWheel.setPWM(myMotorPower);
+          rightWheel.setPWM(myMotorPower);
+          leftWheel.setCount(0);
+          rightWheel.setCount(0);
+		break;
+		case 3:
+          leftWheel.setPWM(-myMotorPower);
+          rightWheel.setPWM(-myMotorPower);
+          leftWheel.setCount(0);
+          rightWheel.setCount(0);
+		break;
+		case 4:
+		switch(turning[turningNow]) {
+			case 1:
+          leftWheel.setPWM(-myMotorPower);
+          rightWheel.setPWM(0);
+			break;
+			case 3:
+          leftWheel.setPWM(0);
+          rightWheel.setPWM(-myMotorPower);
+			break;
+		}
+			//snprintf(str,64,"now :[%3.2f]");
+			//ev3_lcd_draw_string(str,0,10);
+          leftWheel.setCount(0);
+          rightWheel.setCount(0);
 		break;
       }
       change = false;
@@ -64,6 +90,7 @@ rgb_raw_t stageColor;
     switch(mode) {
       case 0:
 		colorSensor.getRawColor(stageColor);
+		
         if(rawColortoColorNumber(stageColor, rgbCoef) == COLOR_NONE) {
 			
         //if(false) {
@@ -90,7 +117,8 @@ rgb_raw_t stageColor;
 		//if(blockSetPhase==3) angle *= -1;
         if(monoWheelRotChk(angle, 1) == 1) {
           ev3_speaker_play_tone(300,30);
-          mode = 0;
+          //mode = 0;
+  		  mode = turning[turningNow]==1? 2: 0;
           change = true;
           leftWheel.setPWM(0);
           rightWheel.setPWM(0);
@@ -99,7 +127,7 @@ rgb_raw_t stageColor;
                 break;
               }
           }
-   		  turningNow = (turningNow + 1) % turningLength;
+   		  if(turning[turningNow]==0) turningNow = (turningNow + 1) % turningLength;
 		  //if(blockSetPhase == 0 && turning[turningNow] == 1) blockSetPhase = 1;
 		  //if(blockSetPhase == 3) blockSetPhase = 0;
 		  tracer.setSelect('R');
@@ -110,7 +138,7 @@ rgb_raw_t stageColor;
 		case 2:
 		distance = 15.0f;
 		//if(blockSetPhase==2) distance*= -1;
-		if(advanceN(distance) == 1) {
+		if(balancingAdvanceChk(distance, 1, myMotorPower) == 1) {
           ev3_speaker_play_tone(300,30);
           mode = 0;
           change = true;
@@ -134,7 +162,8 @@ rgb_raw_t stageColor;
 
         if(monoWheelRotChk(angle, 0) == 1) {
           ev3_speaker_play_tone(300,30);
-          mode = 0;
+          //mode = 0;
+		  mode = turning[turningNow]==3? 2: 0;
           change = true;
           leftWheel.setPWM(0);
           rightWheel.setPWM(0);
@@ -143,7 +172,7 @@ rgb_raw_t stageColor;
                 break;
               }
           }
-   		  turningNow = (turningNow + 1) % turningLength;
+   		  if(turning[turningNow]==4) turningNow = (turningNow + 1) % turningLength;
 		  //if(blockSetPhase == 0 && turning[turningNow] == 1) blockSetPhase = 1;
 		  //if(blockSetPhase == 3) blockSetPhase = 0;
 		  tracer.setSelect('L');
@@ -153,8 +182,43 @@ rgb_raw_t stageColor;
 		break;
 	  }
       break;
+	  // ブロサ前進
 	  case 2:
-	    
+		if(advanceChk(20.0) == 1) {
+          ev3_speaker_play_tone(400,30);
+			mode = 3;
+          change = true;
+		}
+	  break;
+	  // ブロサ後退
+ 	  case 3:
+		if(advanceChk(-20.0) == 1) {
+          ev3_speaker_play_tone(550,30);
+			mode = 4;
+          change = true;
+		}
+	  break;
+	  // 逆ターン
+ 	  case 4:
+			switch(turning[turningNow]){
+				case 1:
+					if(monoWheelRotChk(45, 1) == 1) {
+			          ev3_speaker_play_tone(800,30);
+						turningNow = (turningNow + 1) % turningLength;
+				    	change = true;
+						mode = 0;
+					}
+				break;
+				case 3:
+					if(monoWheelRotChk(45, 0) == 1) {
+			          ev3_speaker_play_tone(800,30);
+						turningNow = (turningNow + 1) % turningLength;
+          				change = true;
+						mode = 0;
+					}
+				break;
+			}
+		
 	  break;
     }
     clock.sleep(4);

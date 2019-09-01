@@ -50,7 +50,7 @@ void tracer_cyc(intptr_t exinf) {
 
 void tracer_task(intptr_t exinf) {
 
-	if(advanceN(cm[mode])){
+	if(advanceChk(cm[mode])){
 		ev3_speaker_play_tone(100,30);
 	  	leftWheel.setCount(0);
 	  	rightWheel.setCount(0);
@@ -128,7 +128,7 @@ void main_task(intptr_t unused) {
   //int blockSetPhase = -1;
 	//int turning[5] = {0, 1, 2, 3, 4};
 	//0~5 右～左
-	int turning[3] = {0, 2, 4};
+	int turning[3] = {2, 1, 4};
 
   btmain(unused);
 
@@ -148,15 +148,19 @@ int monoWheelRotChk(int degree, int leftRight) {
 			  snprintf(str,64,"degree :[%d], travel :[%3.2f]",degree, travel);
 			ev3_lcd_draw_string(str,0,10);
 
-  return (travel >= (float)degree * WIDTH / WHEEL_RADIUS)? 1: 0;
+  return (labs(travel) >= (float)abs(degree) * WIDTH / WHEEL_RADIUS)? 1: 0;
 }
 
-int advanceN(float distance) {
+int advanceChk(float distance) {
+	balancingAdvanceChk(distance, 0, 0);
+}
+
+int balancingAdvanceChk(float distance, int balancing, int pwm) {
 	
 	float radius = 5.0f;
 	float position = distance;
 
-	float balancer = 0;
+	int balancer = 0;
 
 	float leftTravel;
 	float rightTravel;
@@ -166,10 +170,21 @@ int advanceN(float distance) {
 	leftTravel = leftWheel.getCount() * 2.0f * radius * M_PI / 360.0f;
 	rightTravel = rightWheel.getCount() * 2.0f * radius * M_PI / 360.0f;
 
+	if(balancing == 1) {
+		balancer = pwm>0? 1: -1;
+		if(labs(leftTravel) > labs(rightTravel)) {
+			leftWheel.setPWM(pwm-balancer);
+			rightWheel.setPWM(pwm+balancer);
+		} else {
+			leftWheel.setPWM(pwm+balancer);
+			rightWheel.setPWM(pwm-balancer);
+		}
+	}
+
 	progress = (leftTravel + rightTravel) / 2.0f;
 	progress_ratio = progress / position;
 
-  	if(labs(progress) > position){
+  	if(labs(progress) > labs(position)){
   		return 1;
   	}
   	return 0;
