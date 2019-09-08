@@ -39,11 +39,16 @@ int mode = 0;
 // カラーセンサ・白
 rgb_raw_t stageWhite;
 
+double redHSV[3];
+double yellowHSV[3];
+double greenHSV[3];
+double blueHSV[3];
 
 // カラーセンサ補正倍率
 double rgbCoef[3];
 int flg = 1;
 
+int counting = 0;
 void tracer_cyc(intptr_t exinf) {
 	act_tsk(TRACER_TASK);
 }
@@ -86,10 +91,27 @@ void main_task(intptr_t unused) {
 	Clock clock;
 	ev3_speaker_set_volume(5);
 
+
+
+	//カラーセンサの角度制御
+	arm.reset();
+	arm.setPWM(-5);
+
+	int arm_counting = 0;
+	while(1){
+		if(arm_counting >= 100){
+			arm.reset();
+			arm.stop();
+			break;
+		}
+		clock.sleep(4);
+		arm_counting++;
+
+	}
+
 	arm.reset();
 	arm.setPWM(5);
 
-	//カラーセンサの角度制御
 	while(1){
 		if(arm.getCount() >= 30){
 			arm.reset();
@@ -109,7 +131,9 @@ void main_task(intptr_t unused) {
 	tracer.init(course);
 	
   // カラーキャリブレーション
-	colorCalibration(stageWhite, light_black, light_white, light_target, rgbCoef);
+	colorCalibration(stageWhite, light_black, light_white, light_target, rgbCoef
+	, redHSV, yellowHSV, greenHSV, blueHSV
+	);
 
 	//走行開始
 	// ev3_sta_cyc(TRACER_CYC);
@@ -128,11 +152,14 @@ void main_task(intptr_t unused) {
   //int blockSetPhase = -1;
 	//int turning[5] = {0, 1, 2, 3, 4};
 	//0~5 右～左
-	int turning[3] = {2, 1, 4};
+	//int turning[3] = {2, 1, 4};
+	int turning[2] = {0, 4};
+	int turning_count = 2;
 
   btmain(unused);
 
-	blockBingoMethod(tracer, leftWheel, rightWheel, turning, 3, light_white, light_black, rgbCoef);
+	blockBingoMethod(tracer, leftWheel, rightWheel, turning, turning_count, light_white, light_black, rgbCoef
+	, redHSV, yellowHSV, greenHSV, blueHSV);
 
   leftWheel.setPWM(0);
   rightWheel.setPWM(0);
@@ -152,7 +179,7 @@ int monoWheelRotChk(int degree, int leftRight) {
 }
 
 int advanceChk(float distance) {
-	balancingAdvanceChk(distance, 0, 0);
+	return balancingAdvanceChk(distance, 0, 0);
 }
 
 int balancingAdvanceChk(float distance, int balancing, int pwm) {
@@ -160,7 +187,9 @@ int balancingAdvanceChk(float distance, int balancing, int pwm) {
 	float radius = 5.0f;
 	float position = distance;
 
-	int balancer = 0;
+	float balancer = 1.0f;
+	float lowP = 1.0f;
+	float highP = 1.2f;
 
 	float leftTravel;
 	float rightTravel;
@@ -171,19 +200,29 @@ int balancingAdvanceChk(float distance, int balancing, int pwm) {
 	rightTravel = rightWheel.getCount() * 2.0f * radius * M_PI / 360.0f;
 
 	if(balancing == 1) {
-		balancer = pwm>0? 1: -1;
+		//balancer = pwm>0? 1.05: 0.95;
+		//lowP = pwm>0? 1.05: 0.95;
+		//highP = pwm>0? 0.95: 1.05;
 		if(labs(leftTravel) > labs(rightTravel)) {
-			leftWheel.setPWM(pwm-balancer);
-			rightWheel.setPWM(pwm+balancer);
+			if(counting%100==0) ev3_speaker_play_tone(100,30);
+			// leftWheel.setPWM(pwm-balancer);
+			// rightWheel.setPWM(pwm+balancer);
+			leftWheel.setPWM((int)(pwm*lowP));
+			rightWheel.setPWM((int)(pwm*highP));
+			
 		} else {
-			leftWheel.setPWM(pwm+balancer);
-			rightWheel.setPWM(pwm-balancer);
+			if(counting%100==0) ev3_speaker_play_tone(800,30);
+			// leftWheel.setPWM(pwm+balancer);
+			// rightWheel.setPWM(pwm-balancer);
+			leftWheel.setPWM((int)(pwm*highP));
+			rightWheel.setPWM((int)(pwm*lowP));
 		}
 	}
 
 	progress = (leftTravel + rightTravel) / 2.0f;
 	progress_ratio = progress / position;
 
+	counting++;
   	if(labs(progress) > labs(position)){
   		return 1;
   	}

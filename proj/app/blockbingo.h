@@ -1,7 +1,9 @@
-  void blockBingoMethod(Tracer tracer, Motor& leftWheel, Motor& rightWheel, int* turning, int turningLength, int light_white, int light_black, double* rgbCoef) {
+  void blockBingoMethod(Tracer tracer, Motor& leftWheel, Motor& rightWheel, int* turning, int turningLength, int light_white, int light_black, double* rgbCoef
+  , double* redHSV, double* yellowHSV, double* greenHSV, double* blueHSV) {
 	char str[64];
 	int mode = 0;
   bool change = true;
+  bool buttonEnable = true;
 	int turningNow = 0;
 	  int tmpCount = 0;
 
@@ -27,10 +29,20 @@ rgb_raw_t stageColor;
     // モード変わったときにモータのパワーをセットする
     if(change) {
       switch(mode) {
+		  // ライントレースのみ
         case 0:
+          leftWheel.setCount(0);
+          rightWheel.setCount(0);
           //leftWheel.setPWM(myMotorPower);
           //rightWheel.setPWM(myMotorPower);
         break;
+		// カラーセンサ判定のみ
+		case 10:
+          leftWheel.setCount(0);
+          rightWheel.setCount(0);
+          leftWheel.setPWM(myMotorPower);
+          rightWheel.setPWM(myMotorPower);
+		break;
         case 1:
 		switch(turning[turningNow]) {
 			case 0:
@@ -81,6 +93,10 @@ rgb_raw_t stageColor;
           leftWheel.setCount(0);
           rightWheel.setCount(0);
 		break;
+		// 180
+		case 5:
+		
+		break;
       }
       change = false;
     }
@@ -88,10 +104,26 @@ rgb_raw_t stageColor;
     int angle;
 	float distance;
     switch(mode) {
+	  // ライントレースのみ
       case 0:
+		// if(advanceChk(12.0f) == 1) {
+        //   ev3_speaker_play_tone(50,30);
+        //   mode = 10;
+        //   change = true;
+		// }
+
 		colorSensor.getRawColor(stageColor);
-		
-        if(rawColortoColorNumber(stageColor, rgbCoef) == COLOR_NONE) {
+        if(rawColortoColorNumber(stageColor, rgbCoef, redHSV, yellowHSV, greenHSV, blueHSV) != COLOR_NONE) {
+          ev3_speaker_play_tone(50,30);
+          mode = 1;
+          change = true;
+		}
+		break;
+		case 10:
+
+		balancingAdvanceChk(distance, 1, myMotorPower);
+		colorSensor.getRawColor(stageColor);
+        if(rawColortoColorNumber(stageColor, rgbCoef, redHSV, yellowHSV, greenHSV, blueHSV) != COLOR_NONE) {
 			
         //if(false) {
         //if(true) {
@@ -100,7 +132,7 @@ rgb_raw_t stageColor;
           change = true;
           leftWheel.setPWM(0);
           rightWheel.setPWM(0);
-          while(true) {
+          while(buttonEnable) {
               if (touchSensor.isPressed() == true ){
                 break;
               }
@@ -115,6 +147,7 @@ rgb_raw_t stageColor;
 		case 1:
 		angle = turning[turningNow]==0? 90: 45;
 		//if(blockSetPhase==3) angle *= -1;
+		if(tracer.getSelect()=='L') angle += ANGLE_ASSIST;
         if(monoWheelRotChk(angle, 1) == 1) {
           ev3_speaker_play_tone(300,30);
           //mode = 0;
@@ -122,7 +155,7 @@ rgb_raw_t stageColor;
           change = true;
           leftWheel.setPWM(0);
           rightWheel.setPWM(0);
-          while(true) {
+          while(buttonEnable) {
               if (touchSensor.isPressed() == true){
                 break;
               }
@@ -136,7 +169,7 @@ rgb_raw_t stageColor;
         }
 		break;
 		case 2:
-		distance = 15.0f;
+		distance = 10.0f;
 		//if(blockSetPhase==2) distance*= -1;
 		if(balancingAdvanceChk(distance, 1, myMotorPower) == 1) {
           ev3_speaker_play_tone(300,30);
@@ -144,7 +177,7 @@ rgb_raw_t stageColor;
           change = true;
           leftWheel.setPWM(0);
           rightWheel.setPWM(0);
-          while(true) {
+          while(buttonEnable) {
               if (touchSensor.isPressed() == true ){
                 break;
               }
@@ -160,6 +193,7 @@ rgb_raw_t stageColor;
 		angle = turning[turningNow]==3? 45: 90;
 		//if(blockSetPhase==3) angle *= -1;
 
+		if(tracer.getSelect()=='R') angle += ANGLE_ASSIST;
         if(monoWheelRotChk(angle, 0) == 1) {
           ev3_speaker_play_tone(300,30);
           //mode = 0;
@@ -167,7 +201,7 @@ rgb_raw_t stageColor;
           change = true;
           leftWheel.setPWM(0);
           rightWheel.setPWM(0);
-          while(true) {
+          while(buttonEnable) {
               if (touchSensor.isPressed() == true ){
                 break;
               }
@@ -184,7 +218,8 @@ rgb_raw_t stageColor;
       break;
 	  // ブロサ前進
 	  case 2:
-		if(advanceChk(20.0) == 1) {
+		//if(advanceChk(20.0) == 1) {
+		if(balancingAdvanceChk(20.0, 1, myMotorPower) == 1) {
           ev3_speaker_play_tone(400,30);
 			mode = 3;
           change = true;
@@ -192,7 +227,8 @@ rgb_raw_t stageColor;
 	  break;
 	  // ブロサ後退
  	  case 3:
-		if(advanceChk(-20.0) == 1) {
+		//if(advanceChk(-20.0) == 1) {
+		if(balancingAdvanceChk(20.0, 1, -myMotorPower) == 1) {
           ev3_speaker_play_tone(550,30);
 			mode = 4;
           change = true;
@@ -206,7 +242,7 @@ rgb_raw_t stageColor;
 			          ev3_speaker_play_tone(800,30);
 						turningNow = (turningNow + 1) % turningLength;
 				    	change = true;
-						mode = 0;
+						mode = 1;
 					}
 				break;
 				case 3:
@@ -214,7 +250,7 @@ rgb_raw_t stageColor;
 			          ev3_speaker_play_tone(800,30);
 						turningNow = (turningNow + 1) % turningLength;
           				change = true;
-						mode = 0;
+						mode = 1;
 					}
 				break;
 			}

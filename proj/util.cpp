@@ -2,8 +2,8 @@
 #include <math.h>
 #include <stdarg.h>
 
-#define SATURATION_THRESHOLD 50.0
-#define VALUE_THRESHOLD 50.0
+#define SATURATION_THRESHOLD 80.0
+#define VALUE_THRESHOLD 80.0
 
 // 演習用のユーティリティ
 
@@ -65,7 +65,7 @@ double getMin(int len, double val, ...) {
     return _min;
 }
 
-colorid_t rawColortoColorNumber(rgb_raw_t source, double* rgbCoef) {
+colorid_t rawColortoColorNumber(rgb_raw_t source, double* rgbCoef, double* redHSV, double* yellowHSV, double* greenHSV, double* blueHSV) {
   double realR = (double)source.r * rgbCoef[0];
   double realG = (double)source.g * rgbCoef[1];
   double realB = (double)source.b * rgbCoef[2];
@@ -77,7 +77,20 @@ char str[64];
 			ev3_lcd_draw_string(str,0,110);
   rgb2hsv(realR, realG, realB, &H, &S, &V);
 
-  HSVtoColorNumber(H, S, V);
+  HSVtoColorNumber2(H, S, V, redHSV, yellowHSV, greenHSV, blueHSV);
+}
+
+void rawColortoHSV(rgb_raw_t source, double* rgbCoef, double *HSV) {
+  double realR = (double)source.r * rgbCoef[0];
+  double realG = (double)source.g * rgbCoef[1];
+  double realB = (double)source.b * rgbCoef[2];
+  //double H, S, V;
+char str[64];
+			snprintf(str,64,"RGB :[%3u, %3u, %3u]", source.r, source.g, source.b);
+			ev3_lcd_draw_string(str,0,100);
+			snprintf(str,64,"realRGB :[%3.2f, %3.2f, %3.2f]",realR, realG, realB);
+			ev3_lcd_draw_string(str,0,110);
+  rgb2hsv(realR, realG, realB, &HSV[0], &HSV[1], &HSV[2]);
 }
 
 void rgb2hsv(int r, int g, int b){
@@ -90,6 +103,12 @@ void rgb2hsv(int r, int g, int b){
 void rgb2hsv(double r, double g, double b, double* h, double* s, double* v){
   double maxVal = getMax(3, r, g, b);
   double minVal = getMin(3, r, g, b);
+
+if(maxVal >= 255.0) {
+  r*=255.0/maxVal;
+  g*=255.0/maxVal;
+  b*=255.0/maxVal;
+}
 
 char str[64];
 			snprintf(str,64,"maxmin :[%3.2f, %3.2f]",maxVal, minVal);
@@ -149,3 +168,40 @@ char str[64];
 
   return COLOR_NONE;
 }
+
+colorid_t HSVtoColorNumber2(double h, double s, double v, double* redHSV, double* yellowHSV, double* greenHSV, double* blueHSV) {
+double dh = 15.0;
+double ds = 15.0;
+double dv = 15.0;
+
+char str[64];
+			snprintf(str,64,"hsv :[%3.2f, %3.2f, %3.2f]",h, s, v);
+			ev3_lcd_draw_string(str,0,120);
+
+  if(redHSV[0] - dh < h && h < redHSV[0] + dh &&
+  redHSV[1] - ds < s && s < redHSV[1] + ds &&
+  redHSV[2] - dv < v && v < redHSV[2] + dv
+  ) {
+    return COLOR_RED;
+  }
+  if(yellowHSV[0] - dh < h && h < yellowHSV[0] + dh &&
+  yellowHSV[1] - ds < s && s < yellowHSV[1] + ds &&
+  yellowHSV[2] - dv < v && v < yellowHSV[2] + dv
+  ) {
+    return COLOR_YELLOW;
+  }
+  if(greenHSV[0] - dh < h && h < greenHSV[0] + dh &&
+  greenHSV[1] - ds < s && s < greenHSV[1] + ds &&
+  greenHSV[2] - dv < v && v < greenHSV[2] + dv
+  ) {
+    return COLOR_GREEN;
+  }
+  if(blueHSV[0] - dh < h && h < blueHSV[0] + dh &&
+  blueHSV[1] - ds < s && s < blueHSV[1] + ds &&
+  blueHSV[2] - dv < v && v < blueHSV[2] + dv
+  ) {
+    return COLOR_BLUE;
+  }
+  return COLOR_NONE;
+}
+
