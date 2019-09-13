@@ -205,3 +205,22 @@ char str[64];
   return COLOR_NONE;
 }
 
+void rotDir(int* dirx, int* diry, int mode){
+
+  int tmpx = *dirx;
+  int tmpy = *diry;
+  switch(mode) {
+    case 0:
+      *dirx = tmpy * -1;
+      *diry = tmpx;
+    break;
+    case 4:
+      *dirx = tmpy;
+      *diry = tmpx * -1;
+    break;
+    case 5:
+      *dirx *= -1;
+      *diry *= -1;
+    break;
+  }
+}

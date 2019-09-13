@@ -53,8 +53,8 @@ rgb_raw_t stageYellow;
 rgb_raw_t stageGreen;
 rgb_raw_t stageBlue;
 
-FILE * fp;
-fp=fopen("rygb_info.csv","w");
+// FILE * fp;
+// fp=fopen("rygb_info.csv","w");
   while(true){
     if (touchSensor.isPressed()) {
       switch(calibrationMode) {
@@ -116,32 +116,32 @@ fp=fopen("rygb_info.csv","w");
 	  stageWhite.g = 0;
 	  stageWhite.b = 0;
     }
-	if (ev3_button_is_pressed(DOWN_BUTTON)) {
-		switch(calibrationMode) {
-			case 3:
-				fprintf(fp, "red,");
-			break;
-			case 4:
-				fprintf(fp, "yellow,");
-			break;
-			case 5:
-				fprintf(fp, "green,");
-			break;
-			case 6:
-				fprintf(fp, "blue,");
-			break;
-		}
-		rgb_raw_t stageSample;
-		double sampleHSV[3];
-		colorSensor.getRawColor(stageSample);
-		fprintf(fp, "%u,%u,%u\n", stageSample.r, stageSample.g, stageSample.b);
-		rawColortoHSV(stageSample, rgbCoef, sampleHSV);
-		fprintf(fp, "rgbCoef,%f,%f,%f\n", rgbCoef[0], rgbCoef[1], rgbCoef[2]);
-		fprintf(fp, "sampleHSV,%3.1f,%3.1f,%3.1f\n", sampleHSV[0], sampleHSV[1], sampleHSV[2]);
-    	ev3_speaker_play_tone(1200,30);
+	// if (ev3_button_is_pressed(DOWN_BUTTON)) {
+	// 	switch(calibrationMode) {
+	// 		case 3:
+	// 			fprintf(fp, "red,");
+	// 		break;
+	// 		case 4:
+	// 			fprintf(fp, "yellow,");
+	// 		break;
+	// 		case 5:
+	// 			fprintf(fp, "green,");
+	// 		break;
+	// 		case 6:
+	// 			fprintf(fp, "blue,");
+	// 		break;
+	// 	}
+	// 	rgb_raw_t stageSample;
+	// 	double sampleHSV[3];
+	// 	colorSensor.getRawColor(stageSample);
+	// 	fprintf(fp, "%u,%u,%u\n", stageSample.r, stageSample.g, stageSample.b);
+	// 	rawColortoHSV(stageSample, rgbCoef, sampleHSV);
+	// 	fprintf(fp, "rgbCoef,%f,%f,%f\n", rgbCoef[0], rgbCoef[1], rgbCoef[2]);
+	// 	fprintf(fp, "sampleHSV,%3.1f,%3.1f,%3.1f\n", sampleHSV[0], sampleHSV[1], sampleHSV[2]);
+    // 	ev3_speaker_play_tone(1200,30);
 
-		clock.sleep(500);
-	}
+	// 	clock.sleep(500);
+	// }
 	switch(calibrationMode) {
 		case 1:
 			snprintf(str,64,"black :[%d]",light_black);
@@ -184,5 +184,5 @@ fp=fopen("rygb_info.csv","w");
 			break;
 			}
   }
-  fclose(fp);
+//   fclose(fp);
 }

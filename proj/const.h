@@ -4,4 +4,4 @@
 
 #define GREYLEVEL 0.5f
 
-#define ANGLE_ASSIST 10.0f
+#define ANGLE_ASSIST 10

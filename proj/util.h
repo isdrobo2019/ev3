@@ -18,5 +18,6 @@ void rgb2hsv(double r, double g, double b, double* h, double* s, double* v);
 void normalizeRGB(rgb_raw_t source, double* rgbCoef);
 colorid_t HSVtoColorNumber(double h, double s, double v);
 colorid_t HSVtoColorNumber2(double h, double s, double v, double* redHSV, double* yellowHSV, double* greenHSV, double* blueHSV);
+void rotDir(int* dirx, int* diry, int mode);
 
 #endif  // MY_UNTL_H_
