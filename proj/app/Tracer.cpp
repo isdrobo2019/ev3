@@ -8,7 +8,7 @@ Tracer::Tracer():
 void Tracer::init(char course) {
 	
 	select = course;
-	// init_f("Tracer");
+	select2 = course;
 }
 
 // tag::tracer_impl[]
@@ -26,11 +26,14 @@ void Tracer::setSelect(char select) {
 	this->select = select;
 }
 
-
 void Tracer::run(int target, int mode) {
-	float	Kp = 0.6;
-	float	Ki = 0.2;
-	float	Kd = 0.01;
+	//ブロックビンゴ時
+	//float	Kp = 0.6;
+	//float	Ki = 0.2;
+	//float	Kd = 0.01;
+	float	Kp = 0.4;
+	float	Ki = 0;
+	float	Kd = 0.03;
 	
 	float p = 0;
 	float i = 0;
@@ -39,18 +42,15 @@ void Tracer::run(int target, int mode) {
 	float	integral = 0;
 	
 	if(mode <= sizeof(deltaP) / sizeof(int)) {
-//P��D�̒l�͂��̂܂܂œ��삵�܂����B
 		Kp = deltaP[mode];
 		Ki = deltaI[mode];
 		Kd = deltaD[mode];
 		pwm = speed[mode];
-		
 	}
 	
-	if(mode == 4 ){//|| mode == 9) {
+	if(mode == 4 ){
 		target = target + 2;
 	}
-	
 
 	diff[0] = diff[1];
 	diff[1] = colorSensor.getBrightness() - target;
