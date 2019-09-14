@@ -1,5 +1,7 @@
 ﻿// tag::tracer_def[]
 int timecount = 0;
+int* btway;
+int btcount;
 #include "const.h"
 #include "app.h"
 #include "target_test.h"
@@ -229,62 +231,89 @@ char courseLR;
 	int turning[64];// = {2, 5, 5, 5, 5, 5, 5, 5, 5};
 	int turning_count;
 	if(courseLR == 'L') {
-		turning[0] = 1;
-		turning[1] = 0;
-		turning[2] = 4;
-		turning[3] = 4;
-		turning[4] = 3;
+		turning[0] = S_FRONT_RIGHT;
+		turning[1] = S_RIGHT;
+		turning[2] = S_LEFT;
+		turning[3] = S_LEFT;
+		turning[4] = S_FRONT_LEFT;
 
-		turning[5] = 2;
-		turning[6] = 3;
-		turning[7] = 2;
-		turning[8] = 4;
-		turning[9] = 5;
+		turning[5] = S_FRONT;
+		turning[6] = S_FRONT_LEFT;
+		turning[7] = S_FRONT;
+		turning[8] = S_LEFT;
+		turning[9] = S_BACK;
 
-		turning[10] = 1;
-		turning[11] = 2;
-		turning[12] = 1;
+		turning[10] = S_FRONT_RIGHT;
+		turning[11] = S_FRONT;
+		turning[12] = S_FRONT_RIGHT;
 		turning_count = 13;		
 	} else {
-		turning[0] = 2;
-		turning[1] = 2;
-		turning[2] = 3;
-		turning[3] = 4;
-		turning[4] = 4;
+		turning[0] = S_FRONT;
+		turning[1] = S_FRONT;
+		turning[2] = S_FRONT_LEFT;
+		turning[3] = S_LEFT;
+		turning[4] = S_LEFT;
 
-		turning[5] = 3;
-		turning[6] = 2;
-		turning[7] = 4;
-		turning[8] = 3;
-		turning[9] = 2;
+		turning[5] = S_FRONT_LEFT;
+		turning[6] = S_FRONT;
+		turning[7] = S_LEFT;
+		turning[8] = S_FRONT_LEFT;
+		turning[9] = S_FRONT;
 
-		turning[10] = 3;
-		turning[11] = 2;
-		turning[12] = 4;
-		turning[13] = 4;
-		turning[14] = 2;
+		turning[10] = S_FRONT_LEFT;
+		turning[11] = S_FRONT;
+		turning[12] = S_LEFT;
+		turning[13] = S_LEFT;
+		turning[14] = S_FRONT;
 
-		turning[15] = 1;
+		turning[15] = S_FRONT_RIGHT;
 		turning_count = 16;		
 	}
-		// turning[0] = 2;
-		// turning[1] = 5;
-		// turning[2] = 5;
-		// turning[3] = 5;
-		// turning[4] = 5;
+turning[ 0]=0;
+turning[ 1]=1;
+turning[ 2]=5;
+turning[ 3]=0;
+turning[ 4]=7;
+turning[ 5]=3;
+turning[ 6]=3;
+turning[ 7]=6;
+turning[ 8]=1;
+turning[ 9]=3;
+turning[10]=4;
+turning[11]=3;
+turning[12]=3;
+turning[13]=5;
+turning[14]=0;
+turning[15]=3;
+turning[16]=3;
+turning[17]=4;
+turning[18]=3;
+turning[19]=0;
+turning[20]=0;
+turning[21]=2;
+turning[22]=0;
+turning[23]=5;
+turning[24]=3;
+turning[25]=0;
+turning[26]=2;
+turning[27]=0;
+turning[28]=5;
 
-		// turning[5] = 5;
-		// turning[6] = 5;
-		// turning[7] = 5;
-		// turning[8] = 5;
-		// turning[9] = 5;
-		// turning_count = 10;		
+		turning_count = 29;		
 
 
   btmain(unused);
+FILE *btfp;
+btfp = fopen("btresult.log", "w");
+for(int i=0;i<btcount;i++){
+	fprintf(btfp, "btway[%d]=[%d]\n", i, btway[i]);
+}
+fclose(btfp);
 
 	 blockBingoMethod(clock, tracer, leftWheel, rightWheel, turning, turning_count, light_white, light_black, rgbCoef
 	 , redHSV, yellowHSV, greenHSV, blueHSV);
+	//  blockBingoMethod(clock, tracer, leftWheel, rightWheel, btway, btcount, light_white, light_black, rgbCoef
+	//  , redHSV, yellowHSV, greenHSV, blueHSV);
 
 	garage(leftWheel, rightWheel, courseLR);
 
@@ -295,7 +324,7 @@ char courseLR;
 	ev3_speaker_play_tone(400,30);
 	clock.sleep(80);
 
-
+	delete [] btway;
 	ext_tsk();
 }
 

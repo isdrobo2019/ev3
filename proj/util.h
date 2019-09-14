@@ -5,6 +5,14 @@
 #include "TouchSensor.h"
 #include "Clock.h"
 #include "Motor.h"
+#define S_FRONT 0
+#define S_RIGHT 1
+#define S_BACK 2
+#define S_LEFT 3
+#define S_FRONT_LEFT 4
+#define S_FRONT_RIGHT 5
+#define S_BACK_RIGHT 6
+#define S_BACK_LEFT 7
 
 extern void init_f(const char *str);
 extern void msg_f(const char *str, int32_t line);

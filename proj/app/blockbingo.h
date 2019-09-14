@@ -1,11 +1,11 @@
 #include <vector>
 
 void routeLastfix(int* route, int& routeLength) {
-	if(route[routeLength - 1] == 1) {
-		route[routeLength] = 0;
+	if(route[routeLength - 1] == S_FRONT_RIGHT) {
+		route[routeLength] = S_RIGHT;
 		routeLength++;
-	} else if(route[routeLength - 1] == 3) {
-		route[routeLength] == 4;
+	} else if(route[routeLength - 1] == S_FRONT_LEFT) {
+		route[routeLength] == S_LEFT;
 		routeLength++;
 	}
 }
@@ -50,38 +50,38 @@ void routeLastfix(int* route, int& routeLength) {
 
 		int i = 0;
 		if(firstturn) {
-			toGarage[i] = 5;
+			toGarage[i] = S_BACK;
 			i++;
 		}
 		int dxcount = abs(p);
 		if(!firstturn) dxcount--;
 		for(int dx = 0; dx < dxcount; dx++) {
-			toGarage[i] = 2;
+			toGarage[i] = S_FRONT;
 			i++;
 		}
 		if(q != 0) {
-			toGarage[i] = (p * q * r> 0)? 0: 4;
+			toGarage[i] = (p * q * r> 0)? S_RIGHT: S_LEFT;
 			i++;
 			for(int dy = 0; dy < abs(q) - 1; dy++) {
-				toGarage[i] = 2;
+				toGarage[i] = S_FRONT;
 				i++;
 			}
 			if(firstaxis == 'x') {
-				toGarage[i] = (p * q * r> 0)? 4: 0;
+				toGarage[i] = (p * q * r> 0)? S_LEFT: S_RIGHT;
 			} else {
-				toGarage[i] = 2;
+				toGarage[i] = S_FRONT;
 			}
 			i++;
 		} else {
 			if(firstaxis == 'x') {
-				toGarage[i] = 2;
+				toGarage[i] = S_FRONT;
 			} else {
 				int s = (goalx>0?1:-1);
 				if(p==0){
 				int t = (diry==1?1:-1);
-					toGarage[i] = (t * s> 0)? 0: 4;
+					toGarage[i] = (t * s> 0)? S_RIGHT: S_LEFT;
 				} else {
-					toGarage[i] = (p * s> 0)? 4: 0;
+					toGarage[i] = (p * s> 0)? S_LEFT: S_RIGHT;
 				}
 			}
 			i++;
@@ -173,20 +173,22 @@ fp=fopen("blockbingo_nowpos.log","w");
 		break;
         case 1:
 		switch(nowRoute[turningNow]) {
-			case 0:
+			case S_RIGHT:
 			timeSt = clock.now();
-			case 1:
+			case S_FRONT_RIGHT:
+			case S_BACK_RIGHT:
           leftWheel.setPWM(myMotorPower);
           rightWheel.setPWM(0);
 			break;
-			case 2:
+			case S_FRONT:
 			timeSt = clock.now();
           leftWheel.setPWM(myMotorPower);
           rightWheel.setPWM(myMotorPower);
 			break;
-			case 4:
+			case S_LEFT:
 			timeSt = clock.now();
-			case 3:
+			case S_FRONT_LEFT:
+			case S_BACK_LEFT:
           leftWheel.setPWM(0);
           rightWheel.setPWM(myMotorPower);
 			break;
@@ -210,11 +212,13 @@ fp=fopen("blockbingo_nowpos.log","w");
 		break;
 		case 4:
 		switch(nowRoute[turningNow]) {
-			case 1:
+			case S_FRONT_RIGHT:
+			case S_BACK_RIGHT:
           leftWheel.setPWM(-myMotorPower);
           rightWheel.setPWM(0);
 			break;
-			case 3:
+			case S_FRONT_LEFT:
+			case S_BACK_LEFT:
           leftWheel.setPWM(0);
           rightWheel.setPWM(-myMotorPower);
 			break;
@@ -299,15 +303,15 @@ fp=fopen("blockbingo_nowpos.log","w");
       break;
       case 1:
 	  switch(nowRoute[turningNow]){
-		case 0:
-		case 1:
-		angle = nowRoute[turningNow]==0? 90: 45;
+		case S_RIGHT:
+		case S_FRONT_RIGHT:
+		angle = nowRoute[turningNow]==S_RIGHT? 90: 45;
 		//if(blockSetPhase==3) angle *= -1;
-		if(tracer.getSelect()=='L' && nowRoute[turningNow]==0) angle += ANGLE_ASSIST;
+		if(tracer.getSelect()=='L' && nowRoute[turningNow]==S_RIGHT) angle += ANGLE_ASSIST;
         if(monoWheelRotChk(angle, 1) == 1) {
           ev3_speaker_play_tone(300,30);
           //mode = 0;
-  		  mode = nowRoute[turningNow]==1? 2: 0;
+  		  mode = nowRoute[turningNow]==S_FRONT_RIGHT? 2: 0;
           change = true;
           leftWheel.setPWM(0);
           rightWheel.setPWM(0);
@@ -316,7 +320,7 @@ fp=fopen("blockbingo_nowpos.log","w");
                 break;
               }
           }
-   		  if(nowRoute[turningNow]==0) {
+   		  if(nowRoute[turningNow]==S_RIGHT) {
 			fprintf(fp, "case 1 case 0(曲がり)\n");
 			fprintf(fp, "st now = (%d, %d) ,dir = (%d, %d)\n", nowx, nowy, dirx, diry);
 			rotDir(&dirx, &diry, nowRoute[turningNow]);
@@ -332,7 +336,7 @@ fp=fopen("blockbingo_nowpos.log","w");
           rightWheel.setPWM(0);
         }
 		break;
-		case 2:
+		case S_FRONT:
 		distance = 10.0f;
 		//if(blockSetPhase==2) distance*= -1;
 		if(balancingAdvanceChk(distance, 1, myMotorPower) == 1) {
@@ -354,16 +358,16 @@ fp=fopen("blockbingo_nowpos.log","w");
           rightWheel.setPWM(myMotorPower);
 		}
 		break;
-		case 3:
-		case 4:
-		angle = nowRoute[turningNow]==3? 45: 90;
+		case S_FRONT_LEFT:
+		case S_LEFT:
+		angle = nowRoute[turningNow]==S_FRONT_LEFT? 45: 90;
 		//if(blockSetPhase==3) angle *= -1;
 
-		if(tracer.getSelect()=='R' && nowRoute[turningNow]!=3) angle += ANGLE_ASSIST;
+		if(tracer.getSelect()=='R' && nowRoute[turningNow]!=S_FRONT_LEFT) angle += ANGLE_ASSIST;
         if(monoWheelRotChk(angle, 0) == 1) {
           ev3_speaker_play_tone(300,30);
           //mode = 0;
-		  mode = nowRoute[turningNow]==3? 2: 0;
+		  mode = nowRoute[turningNow]==S_FRONT_LEFT? 2: 0;
           change = true;
           leftWheel.setPWM(0);
           rightWheel.setPWM(0);
@@ -372,7 +376,7 @@ fp=fopen("blockbingo_nowpos.log","w");
                 break;
               }
           }
-   		  if(nowRoute[turningNow]==4) {
+   		  if(nowRoute[turningNow]==S_LEFT) {
 			fprintf(fp, "case 1 case 4(曲がり)\n");
 			fprintf(fp, "st now = (%d, %d) ,dir = (%d, %d)\n", nowx, nowy, dirx, diry);
 			rotDir(&dirx, &diry, nowRoute[turningNow]);
@@ -389,16 +393,33 @@ fp=fopen("blockbingo_nowpos.log","w");
         }
 		break;
 		// 180
-		case 5:
+		case S_BACK:
         change = true;
 		mode = 11;
+		break;
+		case S_BACK_RIGHT:		
+			angle = 180;
+	        if(monoWheelRotChk(angle, 1) == 1) {
+			ev3_speaker_play_tone(400,30);
+				mode = 2;
+			change = true;
+			}
+		break;
+		case S_BACK_LEFT:
+			angle = 180;
+	        if(monoWheelRotChk(angle, 0) == 1) {
+			ev3_speaker_play_tone(400,30);
+				mode = 2;
+			change = true;
+			}
 		break;
 	  }
       break;
 	  // ブロサ前進
 	  case 2:
 		//if(advanceChk(20.0) == 1) {
-		if(balancingAdvanceChk(20.0, 1, myMotorPower) == 1) {
+		distance = (nowRoute[turningNow] == S_FRONT_LEFT || nowRoute[turningNow] == S_FRONT_RIGHT )? 20.0: 5.0;
+		if(balancingAdvanceChk(distance, 1, myMotorPower) == 1) {
           ev3_speaker_play_tone(400,30);
 			mode = 3;
           change = true;
@@ -407,7 +428,8 @@ fp=fopen("blockbingo_nowpos.log","w");
 	  // ブロサ後退
  	  case 3:
 		//if(advanceChk(-20.0) == 1) {
-		if(balancingAdvanceChk(20.0, 1, -myMotorPower / 2) == 1) {
+		distance = (nowRoute[turningNow] == S_FRONT_LEFT || nowRoute[turningNow] == S_FRONT_RIGHT )? 20.0: 5.0;
+		if(balancingAdvanceChk(distance, 1, -myMotorPower / 2) == 1) {
           ev3_speaker_play_tone(550,30);
 			mode = 4;
           change = true;
@@ -416,7 +438,7 @@ fp=fopen("blockbingo_nowpos.log","w");
 	  // 逆ターン
  	  case 4:
 			switch(nowRoute[turningNow]){
-				case 1:
+				case S_FRONT_RIGHT:
 					angle = (tracer.getSelect()=='R')? 35: 55;
 					if(monoWheelRotChk(angle, 1) == 1) {
 			          ev3_speaker_play_tone(800,30);
@@ -425,8 +447,28 @@ fp=fopen("blockbingo_nowpos.log","w");
 						mode = 1;
 					}
 				break;
-				case 3:
+				case S_FRONT_LEFT:
 					angle = (tracer.getSelect()=='L')? 35: 55;
+					if(monoWheelRotChk(angle, 0) == 1) {
+			          ev3_speaker_play_tone(800,30);
+						turningNow++;// = (turningNow + 1) % routeLength;
+          				change = true;
+						mode = 1;
+					}
+				break;
+				case S_BACK_RIGHT:
+					//angle = (tracer.getSelect()=='L')? 35: 55;
+					angle = 180;
+					if(monoWheelRotChk(angle, 1) == 1) {
+			          ev3_speaker_play_tone(800,30);
+						turningNow++;// = (turningNow + 1) % routeLength;
+          				change = true;
+						mode = 1;
+					}
+				break;
+				case S_BACK_LEFT:
+					//angle = (tracer.getSelect()=='L')? 35: 55;
+					angle = 180;
 					if(monoWheelRotChk(angle, 0) == 1) {
 			          ev3_speaker_play_tone(800,30);
 						turningNow++;// = (turningNow + 1) % routeLength;

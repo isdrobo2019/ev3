@@ -120,10 +120,11 @@ static size_t encode_packet(uint8_t reqcode, uint16_t points[], size_t num_of_po
 	return packet_size;
 }
 
-static int decode_packet(uint8_t rescode, uint8_t *data, size_t data_len, PointColor **result, size_t *num_of_result, char **errmsg)
+static int decode_packet(uint8_t rescode, uint8_t *data, size_t data_len, uint8_t **result, size_t *num_of_result, char **errmsg)
 {
 	size_t num_of_points = 0;
-	PointColor *l_result = NULL;
+	//PointColor *l_result = NULL;
+	uint8_t *l_result = NULL;
 	char *l_errmsg = NULL;
 	size_t i = 0;
 	size_t data_index = 0;
@@ -139,14 +140,18 @@ static int decode_packet(uint8_t rescode, uint8_t *data, size_t data_len, PointC
 			return -1;
 		}
 		num_of_points = (size_t)data[data_index++];
-		l_result = (PointColor *)malloc(sizeof(PointColor)*num_of_points);
+		//l_result = (PointColor *)malloc(sizeof(PointColor)*num_of_points);
+		l_result = (uint8_t *)malloc(sizeof(uint8_t)*num_of_points);
+
 		if ( l_result == NULL ) {
 			error("failed to malloc");
 			return -1;
 		}
-		for ( i = 0; i < num_of_points; i++, data_index = data_index + 3 ) {
-			l_result[i].point = ((uint16_t)data[data_index] << 8) + (uint16_t)data[data_index+1]; /* from network byte order */
-			l_result[i].color = (EColor)data[data_index+2];
+		//for ( i = 0; i < num_of_points; i++, data_index = data_index + 3 ) {
+		for ( i = 0; i < num_of_points; i++, data_index++) {
+			// l_result[i].point = ((uint16_t)data[data_index] << 8) + (uint16_t)data[data_index+1]; /* from network byte order */
+			// l_result[i].color = (EColor)data[data_index+2];
+			l_result[i] = (uint8_t)data[data_index];
 		}
 	} else if ( rescode == eError ) {
 		if ( errmsg == NULL ) {
@@ -233,7 +238,7 @@ static int serial_read(FILE *bt, uint8_t *code, uint8_t **data, size_t *data_len
 	return 0;
 }
 
-void end(FILE *bt, uint8_t *request, uint8_t *response, PointColor *result, char *errmsg);
+void end(FILE *bt, uint8_t *request, uint8_t *response, uint8_t *result, char *errmsg);
 
 void btmain(intptr_t unused)
 {
@@ -245,7 +250,8 @@ void btmain(intptr_t unused)
 	uint8_t *response = NULL;
 	size_t response_len = 0;
 	uint16_t points[] = { 1, 2, 3 }; /* 要求する座標IDの配列 */
-	PointColor *result = NULL;
+	// PointColor *result = NULL;
+	uint8_t *result = NULL;
 	size_t num_of_result = 0;
 	char *errmsg = NULL;
 	size_t i = 0;
@@ -321,12 +327,18 @@ void btmain(intptr_t unused)
 	}
 	
 	// 色判定結果をLCDへ出力
-	for ( i = 0; i < num_of_result; i = i + 2 ) {
-		lcd_print("(%u, %s)", result[i].point, color2str(result[i].color));
-		if ( i+1 < num_of_result ) {
-			lcd_print(" (%u, %s)", result[i+1].point, color2str(result[i+1].color));
-		}
-		lcd_print("\n");
+	// for ( i = 0; i < num_of_result; i = i + 2 ) {
+	// 	lcd_print("(%u, %s)", result[i].point, color2str(result[i].color));
+	// 	if ( i+1 < num_of_result ) {
+	// 		lcd_print(" (%u, %s)", result[i+1].point, color2str(result[i+1].color));
+	// 	}
+	// 	lcd_print("\n");
+	// }
+	btway = new int[num_of_result + 1];
+	btcount = num_of_result;
+	for( i = 0; i < num_of_result; i++) {
+		btway[i] = (int)result[i];
+		lcd_print("btway[%d]=%d\n", i, btway[i]);
 	}
 	if ( errmsg != NULL ) {
 		lcd_print("errmsg = %s\n", errmsg);
@@ -335,7 +347,7 @@ void btmain(intptr_t unused)
 	return;
 }
 
-void end(FILE *bt, uint8_t *request, uint8_t *response, PointColor *result, char *errmsg) {
+void end(FILE *bt, uint8_t *request, uint8_t *response, uint8_t *result, char *errmsg) {
 	if ( bt != NULL ) {
 		fclose(bt);
 		lcd_print("bluetooth disconnected.\n");
