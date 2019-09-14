@@ -106,7 +106,7 @@ rgb_raw_t stageBlue;
       }
       calibrationMode++;
     }
-    if(calibrationMode == 7) break;
+    if(calibrationMode == 8) break;
     if (ev3_button_is_pressed(LEFT_BUTTON)) {
       calibrationMode = 0;
       light_black = -1;
@@ -145,12 +145,12 @@ rgb_raw_t stageBlue;
 	switch(calibrationMode) {
 		case 1:
 			snprintf(str,64,"black :[%d]",light_black);
-			ev3_lcd_draw_string(str,0,10);
+			//ev3_lcd_draw_string(str,0,10);
 		case 2:
 			snprintf(str,64,"white :[%d]",light_white);
-			ev3_lcd_draw_string(str,0,20);
+			//ev3_lcd_draw_string(str,0,20);
 			snprintf(str,64,"target:[%d]",light_target);
-			ev3_lcd_draw_string(str,0,30);
+			//ev3_lcd_draw_string(str,0,30);
 		case 3:
 			snprintf(str,64,"r     :[%u]",stageWhite.r);
 			ev3_lcd_draw_string(str,0,40);

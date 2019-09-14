@@ -1,4 +1,4 @@
-// tag::tracer_def[]
+﻿// tag::tracer_def[]
 int timecount = 0;
 #include "const.h"
 #include "app.h"
@@ -21,6 +21,7 @@ using namespace ev3api;
 Tracer tracer;                  // Tracerのインスタンスを作成
 ColorSensor colorSensor(PORT_2);
 
+Clock clock;
 Motor leftWheel(PORT_C);
 Motor rightWheel(PORT_B);
 
@@ -34,9 +35,12 @@ int light_black = 0;
 int light_target = 0;
 int first_target = 0;
 
-float cm[15] = {55, 75, 50, 80, 90, 95, 115, 80, 80, 20, 170, 60, 140, 70, 10};
+float tracer_cm[15] = {55, 75, 50, 80, 90, 95, 115, 80, 80, 20, 170, 60, 140, 70, 10};
+float reserve_cm[15] = {55, 75, 50, 80, 115, 0, 110, 30, 25, 107, 150, 20, 170, 70, 10};
 
 int mode = 0;
+int pwm = 40;//50;
+int inside_pwm = 20;//25;
 
 // カラーセンサ・白
 rgb_raw_t stageWhite;
@@ -51,14 +55,56 @@ double rgbCoef[3];
 int flg = 1;
 
 int counting = 0;
-void tracer_cyc(intptr_t exinf) {
-	act_tsk(TRACER_TASK);
+void reserve_cyc(intptr_t exinf) {
+
+	timecount += 4;
+	if(mode == 5){
+		//回転
+		leftWheel.setPWM(-20);
+		rightWheel.setPWM(20);
+		if(rotationChk(177)){
+			ev3_speaker_play_tone(100,30);
+	  		leftWheel.setCount(0);
+	  		rightWheel.setCount(0);
+			mode++;
+			
+			tracer.setSelect('L');
+		}
+	}else{
+		
+		if(advanceChk(reserve_cm[mode])){
+			ev3_speaker_play_tone(500,30);
+		  	leftWheel.setCount(0);
+		  	rightWheel.setCount(0);
+
+			mode++;
+				
+		}
+		
+		if(mode == 0){
+			tracer.run(first_target, mode);
+		} if(mode == 7){
+			tracer.run(light_target - 4, mode);
+		}else {
+		
+			tracer.run(light_target, mode);
+		}
+	}
+
+	if(mode ==  sizeof(reserve_cm) / sizeof(int)){
+		ev3_speaker_play_tone(300,30);
+		wup_tsk(MAIN_TASK);
+	}
+
+	ext_tsk();
 }
 
-void tracer_task(intptr_t exinf) {
+// ライントレースタスク
+void tracer_cyc(intptr_t exinf) {
 
-	if(advanceChk(cm[mode])){
-		ev3_speaker_play_tone(100,30);
+	timecount += 4;
+	if(advanceChk(tracer_cm[mode])){
+		ev3_speaker_play_tone(500,30);
 	  	leftWheel.setCount(0);
 	  	rightWheel.setCount(0);
 
@@ -71,11 +117,9 @@ void tracer_task(intptr_t exinf) {
 		
 		tracer.run(light_target, mode);
 	}
-	
-	tracer.run(light_target, mode);
 
-	if(mode ==  sizeof(cm) / sizeof(int)){
-		ev3_speaker_play_tone(100,30);
+	if(mode ==  sizeof(tracer_cm) / sizeof(int)){
+		ev3_speaker_play_tone(300,30);
 		wup_tsk(MAIN_TASK);         // 左ボタン押下でメインを起こす
 	}
 	
@@ -91,14 +135,13 @@ void main_task(intptr_t unused) {
 char courseLR;
 	TouchSensor touchSensor(PORT_1);
 	Motor arm(PORT_A);
-	Clock clock;
 	ev3_speaker_set_volume(5);
 
 
 
 	//カラーセンサの角度制御
 	arm.reset();
-	arm.setPWM(-5);
+	arm.setPWM(-8);
 
 	int arm_counting = 0;
 	while(1){
@@ -114,7 +157,7 @@ char courseLR;
 
 	arm.reset();
 	arm.setPWM(5);
-
+	//カラーセンサの角度制御
 	while(1){
 		if(arm.getCount() >= 30){
 			arm.reset();
@@ -138,17 +181,36 @@ char courseLR;
 	colorCalibration(stageWhite, light_black, light_white, light_target, rgbCoef
 	, redHSV, yellowHSV, greenHSV, blueHSV
 	);
-
-	//走行開始
-	// ev3_sta_cyc(TRACER_CYC);
-	// slp_tsk();
 	
-	// //走行終了
-	// ev3_stp_cyc(TRACER_CYC);
-	// tracer.terminate();
+	clock.reset();
+	leftWheel.setCount(0);
+	rightWheel.setCount(0);
+	
+	
+	//現在の反射光を取得
+	first_target = colorSensor.getBrightness();
+	
+	clock.sleep(200);
 
-  // ブロックビンゴ仮？
-  //rgb2hsv(0,0,0);
+	
+	// //走行開始
+	// if(course== 'R'){
+	// 	//ライントレース(回転)
+	// 	ev3_sta_cyc(RESERVE_CYC);
+	// 	slp_tsk();
+	// 	ev3_stp_cyc(RESERVE_CYC);
+	// } else {
+	// 	//ライントレース
+	// 	ev3_sta_cyc(TRACER_CYC);
+	// 	slp_tsk();
+	// 	ev3_stp_cyc(TRACER_CYC);
+	// }
+
+//走行終了
+//tracer.terminate();
+// slp_tsk();
+
+  // ブロックビンゴ仮
   //float constvaltest = WIDTH_RADIUS;
   // leftWheel.setPWM((Motor::PWM_MAX)/5);
   // rightWheel.setPWM((Motor::PWM_MAX)/5);
@@ -164,13 +226,65 @@ char courseLR;
 	//int turning[9] = {4, 0, 4, 0, 2, 0, 0, 4, 0};
 	//int turning_count = 9;
 
-	int turning[9] = {2, 5, 5, 5, 5, 5, 5, 5, 5};
-	int turning_count = 9;
+	int turning[64];// = {2, 5, 5, 5, 5, 5, 5, 5, 5};
+	int turning_count;
+	if(courseLR == 'L') {
+		turning[0] = 1;
+		turning[1] = 0;
+		turning[2] = 4;
+		turning[3] = 4;
+		turning[4] = 3;
+
+		turning[5] = 2;
+		turning[6] = 3;
+		turning[7] = 2;
+		turning[8] = 4;
+		turning[9] = 5;
+
+		turning[10] = 1;
+		turning[11] = 2;
+		turning[12] = 1;
+		turning_count = 13;		
+	} else {
+		turning[0] = 2;
+		turning[1] = 2;
+		turning[2] = 3;
+		turning[3] = 4;
+		turning[4] = 4;
+
+		turning[5] = 3;
+		turning[6] = 2;
+		turning[7] = 4;
+		turning[8] = 3;
+		turning[9] = 2;
+
+		turning[10] = 3;
+		turning[11] = 2;
+		turning[12] = 4;
+		turning[13] = 4;
+		turning[14] = 2;
+
+		turning[15] = 1;
+		turning_count = 16;		
+	}
+		// turning[0] = 2;
+		// turning[1] = 5;
+		// turning[2] = 5;
+		// turning[3] = 5;
+		// turning[4] = 5;
+
+		// turning[5] = 5;
+		// turning[6] = 5;
+		// turning[7] = 5;
+		// turning[8] = 5;
+		// turning[9] = 5;
+		// turning_count = 10;		
+
 
   btmain(unused);
 
-	// blockBingoMethod(tracer, leftWheel, rightWheel, turning, turning_count, light_white, light_black, rgbCoef
-	// , redHSV, yellowHSV, greenHSV, blueHSV);
+	 blockBingoMethod(clock, tracer, leftWheel, rightWheel, turning, turning_count, light_white, light_black, rgbCoef
+	 , redHSV, yellowHSV, greenHSV, blueHSV);
 
 	garage(leftWheel, rightWheel, courseLR);
 
@@ -195,6 +309,27 @@ int monoWheelRotChk(int degree, int leftRight) {
 			ev3_lcd_draw_string(str,0,10);
 
   return (labs(travel) >= (float)abs(degree) * WIDTH / WHEEL_RADIUS)? 1: 0;
+}
+
+int rotationChk(float angle) {
+
+	//直径（タイヤ間
+	float diameter = 14.5f;
+	float radius = 5.0f;
+	float rightTravel;
+	float leftTravel;
+	float Travel;
+
+	float distance = diameter * M_PI * angle / 360.0f;
+	rightTravel = rightWheel.getCount() * 2.0f * radius * M_PI / 360.0f;
+	leftTravel = leftWheel.getCount() * 2.0f * radius * M_PI / 360.0f;
+	Travel = (labs(rightTravel) + labs(leftTravel)) /2.0f;
+	
+	
+	if(Travel >= distance){
+		return 1;
+	}
+	return 0;
 }
 
 int advanceChk(float distance) {

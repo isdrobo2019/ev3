@@ -15,13 +15,14 @@ extern "C" {
 #ifndef TOPPERS_MACRO_ONLY
 
 extern void main_task(intptr_t exinf);
-extern void tracer_task(intptr_t exinf);
 extern void tracer_cyc(intptr_t exinf);
+extern void reserve_cyc(intptr_t exinf);
 
 extern int monoWheelRotChk(int degree, int leftRight);
 extern int advanceChk(float distance);
 extern int balancingAdvanceChk(float distance, int balancing, int pwm);
 extern int balancingAdvanceChk2(float distance, int balancing, int pwm, float pwmRate);
+extern int rotationChk(float angle);
 
 #endif /* TOPPERS_MACRO_ONLY */
 
