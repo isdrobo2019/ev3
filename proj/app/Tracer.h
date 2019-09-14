@@ -24,9 +24,9 @@ private:
 	float curI = 0.2;
 
 	//Lコース
-	float deltaP[15] = {0.4, 0.8, 0.4, 0.7, 0.9, 0.9, 0.7, 0.4, 0.8, 0.4, 0.9, 0.4, 0.6, 0.8, 0.4};
-	float deltaI[15] = {strI, curI, strI, curI, curI, curI, curI, strI, curI, strI, curI, strI, strI, curI, curI};
-	float deltaD[15] = {0, 0.01, 0, 0.01, 0.03, 0.02, 0.01, 0, 0.01, 0, 0.02, 0, 0, 0, 0};
+	float LdeltaP[15] = {0.4, 0.8, 0.4, 0.7, 0.9, 0.9, 0.7, 0.4, 0.8, 0.4, 0.9, 0.4, 0.6, 0.8, 0.4};
+	float LdeltaI[15] = {strI, curI, strI, curI, curI, curI, curI, strI, curI, strI, curI, strI, strI, curI, curI};
+	float LdeltaD[15] = {0, 0.01, 0, 0.01, 0.03, 0.02, 0.01, 0, 0.01, 0, 0.02, 0, 0, 0, 0};
 
 	//Rコース
 	float RdeltaP[15] = {0.4, 0.7, 0.4, 0.7, 0.9, 0, 0.9, 0.2, 0.4, 0.7, 0.9, 0.4, 0.6, 0.8, 0.4};

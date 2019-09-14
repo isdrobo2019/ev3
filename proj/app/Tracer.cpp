@@ -32,11 +32,25 @@ void Tracer::run(int target, int mode) {
 	float	Ki = 0.2;
 	float	Kd = 0.01;
 	
+	float* deltaP;
+	float* deltaI;
+	float* deltaD;
+	
 	float p = 0;
 	float i = 0;
 	float d = 0;
 	int pwm = 15;
 	float	integral = 0;
+	
+	if(select2 = 'L'){
+		deltaP = LdeltaP;
+		deltaI = LdeltaI;
+		deltaD = LdeltaD;
+	}else{
+		deltaP = RdeltaP;
+		deltaI = RdeltaI;
+		deltaD = RdeltaD;
+	}
 	
 	if(mode <= sizeof(deltaP) / sizeof(int)) {
 		Kp = deltaP[mode];
