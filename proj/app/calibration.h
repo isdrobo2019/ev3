@@ -159,28 +159,28 @@ rgb_raw_t stageBlue;
 			snprintf(str,64,"b     :[%u]",stageWhite.b);
 			ev3_lcd_draw_string(str,0,60);
 
-			snprintf(str,64,"rCoef :[%f]",rgbCoef[0]);
-			ev3_lcd_draw_string(str,0,70);
-			snprintf(str,64,"gCoef :[%f]",rgbCoef[1]);
-			ev3_lcd_draw_string(str,0,80);
-			snprintf(str,64,"bCoef :[%f]",rgbCoef[2]);
-			ev3_lcd_draw_string(str,0,90);
+			// snprintf(str,64,"rCoef :[%f]",rgbCoef[0]);
+			// ev3_lcd_draw_string(str,0,70);
+			// snprintf(str,64,"gCoef :[%f]",rgbCoef[1]);
+			// ev3_lcd_draw_string(str,0,80);
+			// snprintf(str,64,"bCoef :[%f]",rgbCoef[2]);
+			// ev3_lcd_draw_string(str,0,90);
 			break;
 			case 4:
 			snprintf(str,64,"redHSV :[%3.1f, %3.1f, %3.1f]", redHSV[0], redHSV[1], redHSV[2]);
-			ev3_lcd_draw_string(str,0,100);
+			ev3_lcd_draw_string(str,0,70);
 			break;
 			case 5:
 			snprintf(str,64,"yellowHSV :[%3.1f, %3.1f, %3.1f]", yellowHSV[0], yellowHSV[1], yellowHSV[2]);
-			ev3_lcd_draw_string(str,0,110);
+			ev3_lcd_draw_string(str,0,80);
 			break;
 			case 6:
 			snprintf(str,64,"greenHSV :[%3.1f, %3.1f, %3.1f]", greenHSV[0], greenHSV[1], greenHSV[2]);
-			ev3_lcd_draw_string(str,0,120);
+			ev3_lcd_draw_string(str,0,90);
 			break;
 			case 7:
 			snprintf(str,64,"blueHSV :[%3.1f, %3.1f, %3.1f]", blueHSV[0], blueHSV[1], blueHSV[2]);
-			ev3_lcd_draw_string(str,0,130);
+			ev3_lcd_draw_string(str,0,100);
 			break;
 			}
   }

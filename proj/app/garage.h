@@ -11,7 +11,8 @@ void garage(Motor& leftWheel, Motor& rightWheel, char LR) {
 	leftWheel.setPWM(myMotorPower);
 	rightWheel.setPWM(myMotorPower);
 
-	distance = 26.0f;
+	// distance = 26.0f;
+	distance = 35.0f;
 	while(balancingAdvanceChk(distance, 1, myMotorPower) != 1) clock.sleep(4);
 	
 	leftWheel.setCount(0);
@@ -29,7 +30,8 @@ void garage(Motor& leftWheel, Motor& rightWheel, char LR) {
 	rightWheel.setCount(0);
 	leftWheel.setPWM(myMotorPower);
 	rightWheel.setPWM(myMotorPower);
-	distance = 18.0f;
+	// distance = 18.0f;
+	distance = 33.0f;
 	while(balancingAdvanceChk(distance, 1, myMotorPower) != 1) clock.sleep(4);
 
 	leftWheel.setCount(0);
@@ -37,14 +39,14 @@ void garage(Motor& leftWheel, Motor& rightWheel, char LR) {
 	leftWheel.setPWM(0);
 	rightWheel.setPWM(myMotorPower);
 
-	angle = 90;
+	angle = 95;
 	while(monoWheelRotChk(angle, 0) != 1) clock.sleep(4);
 
 	leftWheel.setCount(0);
 	rightWheel.setCount(0);
 	leftWheel.setPWM(myMotorPower);
 	rightWheel.setPWM(myMotorPower);
-	distance = 25.0f;
+	distance = 40.0f;
 	while(balancingAdvanceChk(distance, 1, myMotorPower) != 1) clock.sleep(4);
 	leftWheel.setPWM(0);
 	rightWheel.setPWM(0);

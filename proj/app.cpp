@@ -37,8 +37,10 @@ int light_black = 0;
 int light_target = 0;
 int first_target = 0;
 
-float tracer_cm[15] = {55, 75, 50, 80, 90, 95, 115, 80, 80, 20, 170, 60, 140, 70, 10};
-float reserve_cm[15] = {55, 75, 50, 80, 115, 0, 110, 30, 25, 107, 150, 20, 170, 70, 10};
+float tracer_cm[15] = {55, 75, 50, 80, 90, 95, 115, 80, 80, 20, 170, 60, 140, 65, 0};
+float reserve_cm[15] = {55, 75, 50, 80, 115, 0, 110, 30, 25, 107, 150, 20, 170, 65, 0};
+// float tracer_cm[15] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+// float reserve_cm[15] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 
 int mode = 0;
 int pwm = 40;//50;
@@ -134,6 +136,7 @@ void tracer_cyc(intptr_t exinf) {
 
 void main_task(intptr_t unused) {
 
+bool usebt = false;
 char courseLR;
 	TouchSensor touchSensor(PORT_1);
 	Motor arm(PORT_A);
@@ -194,18 +197,18 @@ char courseLR;
 	
 	clock.sleep(200);
 
-	
-	// //走行開始
+	mode = 0;
+	//走行開始
 	// if(course== 'R'){
 	// 	//ライントレース(回転)
 	// 	ev3_sta_cyc(RESERVE_CYC);
 	// 	slp_tsk();
 	// 	ev3_stp_cyc(RESERVE_CYC);
 	// } else {
-	// 	//ライントレース
-	// 	ev3_sta_cyc(TRACER_CYC);
-	// 	slp_tsk();
-	// 	ev3_stp_cyc(TRACER_CYC);
+		//ライントレース
+		ev3_sta_cyc(TRACER_CYC);
+		slp_tsk();
+		ev3_stp_cyc(TRACER_CYC);
 	// }
 
 //走行終了
@@ -227,93 +230,77 @@ char courseLR;
 
 	//int turning[9] = {4, 0, 4, 0, 2, 0, 0, 4, 0};
 	//int turning_count = 9;
+		
+	int* turning;// = {2, 5, 5, 5, 5, 5, 5, 5, 5};
 
-	int turning[64];// = {2, 5, 5, 5, 5, 5, 5, 5, 5};
-	int turning_count;
-	if(courseLR == 'L') {
-		turning[0] = S_FRONT_RIGHT;
-		turning[1] = S_RIGHT;
-		turning[2] = S_LEFT;
-		turning[3] = S_LEFT;
-		turning[4] = S_FRONT_LEFT;
-
-		turning[5] = S_FRONT;
-		turning[6] = S_FRONT_LEFT;
-		turning[7] = S_FRONT;
-		turning[8] = S_LEFT;
-		turning[9] = S_BACK;
-
-		turning[10] = S_FRONT_RIGHT;
-		turning[11] = S_FRONT;
-		turning[12] = S_FRONT_RIGHT;
-		turning_count = 13;		
-	} else {
-		turning[0] = S_FRONT;
-		turning[1] = S_FRONT;
-		turning[2] = S_FRONT_LEFT;
-		turning[3] = S_LEFT;
-		turning[4] = S_LEFT;
-
-		turning[5] = S_FRONT_LEFT;
-		turning[6] = S_FRONT;
-		turning[7] = S_LEFT;
-		turning[8] = S_FRONT_LEFT;
-		turning[9] = S_FRONT;
-
-		turning[10] = S_FRONT_LEFT;
-		turning[11] = S_FRONT;
-		turning[12] = S_LEFT;
-		turning[13] = S_LEFT;
-		turning[14] = S_FRONT;
-
-		turning[15] = S_FRONT_RIGHT;
-		turning_count = 16;		
+	// 受け取る
+	if(usebt) {
+		btmain(unused);
 	}
-turning[ 0]=0;
-turning[ 1]=1;
-turning[ 2]=5;
-turning[ 3]=0;
-turning[ 4]=7;
-turning[ 5]=3;
-turning[ 6]=3;
-turning[ 7]=6;
-turning[ 8]=1;
-turning[ 9]=3;
-turning[10]=4;
-turning[11]=3;
-turning[12]=3;
-turning[13]=5;
-turning[14]=0;
-turning[15]=3;
-turning[16]=3;
-turning[17]=4;
-turning[18]=3;
-turning[19]=0;
-turning[20]=0;
-turning[21]=2;
-turning[22]=0;
-turning[23]=5;
-turning[24]=3;
-turning[25]=0;
-turning[26]=2;
-turning[27]=0;
-turning[28]=5;
+	else {
+		// 経路を手動で用意
+		btway = new int[64];
+		if(courseLR == 'L') {
+			btway[0] = S_FRONT;
+			// turning[0] = S_FRONT_RIGHT;
+			// turning[1] = S_RIGHT;
+			// turning[2] = S_LEFT;
+			// turning[3] = S_LEFT;
+			// turning[4] = S_FRONT_LEFT;
 
-		turning_count = 29;		
+			// turning[5] = S_FRONT;
+			// turning[6] = S_FRONT_LEFT;
+			// turning[7] = S_FRONT;
+			// turning[8] = S_LEFT;
+			// turning[9] = S_BACK;
 
+			// turning[10] = S_FRONT_RIGHT;
+			// turning[11] = S_FRONT;
+			// turning[12] = S_FRONT_RIGHT;
+			btcount = 1;		
+		} else {
+			btway[0] = S_FRONT;
+			btway[1] = S_FRONT;
+			btway[2] = S_FRONT_LEFT;
+			btway[3] = S_LEFT;
+			btway[4] = S_LEFT;
 
-  btmain(unused);
-FILE *btfp;
-btfp = fopen("btresult.log", "w");
-for(int i=0;i<btcount;i++){
-	fprintf(btfp, "btway[%d]=[%d]\n", i, btway[i]);
-}
-fclose(btfp);
+			btway[5] = S_FRONT_LEFT;
+			btway[6] = S_FRONT;
+			btway[7] = S_LEFT;
+			btway[8] = S_FRONT_LEFT;
+			btway[9] = S_FRONT;
 
-	 blockBingoMethod(clock, tracer, leftWheel, rightWheel, turning, turning_count, light_white, light_black, rgbCoef
+			btway[10] = S_FRONT_LEFT;
+			btway[11] = S_FRONT;
+			btway[12] = S_LEFT;
+			btway[13] = S_LEFT;
+			btway[14] = S_FRONT;
+
+			btway[15] = S_FRONT_RIGHT;
+			btcount = 16;		
+		}
+	}
+
+	FILE *btfp;
+	btfp = fopen("btresult.log", "w");
+	fprintf(btfp, "usebt = %d\n", usebt);
+	for(int i=0;i< btcount;i++){
+		fprintf(btfp, "way[%d]=[%d]\n", i, btway[i]);
+	}
+	fclose(btfp);
+
+	ev3_speaker_play_tone(1000,30);
+	 blockBingoMethod(clock, tracer, leftWheel, rightWheel, btway, btcount, light_white, light_black, rgbCoef
 	 , redHSV, yellowHSV, greenHSV, blueHSV);
-	//  blockBingoMethod(clock, tracer, leftWheel, rightWheel, btway, btcount, light_white, light_black, rgbCoef
-	//  , redHSV, yellowHSV, greenHSV, blueHSV);
+
+
+// FILE *btfp;
+// btfp = fopen("btresult.log", "w");
+// for(int i=0;i<btcount;i++){
+// 	fprintf(btfp, "btway[%d]=[%d]\n", i, btway[i]);
+// }
+// fclose(btfp);
 
 	garage(leftWheel, rightWheel, courseLR);
 

@@ -7,6 +7,12 @@ void routeLastfix(int* route, int& routeLength) {
 	} else if(route[routeLength - 1] == S_FRONT_LEFT) {
 		route[routeLength] == S_LEFT;
 		routeLength++;
+	} else if(route[routeLength - 1] == S_BACK_LEFT) {
+		route[routeLength] == S_LEFT;
+		routeLength++;
+	} else if(route[routeLength - 1] == S_BACK_RIGHT) {
+		route[routeLength] == S_RIGHT;
+		routeLength++;
 	}
 }
 
@@ -147,6 +153,21 @@ routeLength = turningLength;
 int nowtime = 0;
 int timeSum = 0;
 uint timeSt;
+
+	ev3_speaker_play_tone(400,30);
+	clock.sleep(80);
+	ev3_speaker_play_tone(300,30);
+	clock.sleep(80);
+	ev3_speaker_play_tone(200,30);
+	clock.sleep(80);
+
+	while(buttonEnable) {
+		if (touchSensor.isPressed() == true ){
+		break;
+		}
+	}
+
+SaturationMin(redHSV, yellowHSV, greenHSV, blueHSV);
 
 fp=fopen("blockbingo_nowpos.log","w");
   // 難所whileループ部分
@@ -510,7 +531,7 @@ fp=fopen("blockbingo_nowpos.log","w");
 		float timeAve = (float)timeSum / (float)nowtime;
 		goGarage(toGarage, toGarageLength, nowx, nowy, goalx, goaly, dirx, diry);
 		// 115
-		if(toGarageLength * timeAve + clock.now() >= 1000 * 25 || turningNow == routeLength || ev3_button_is_pressed(DOWN_BUTTON)) {
+		if(toGarageLength * timeAve + clock.now() >= 1000 * 115 || turningNow == routeLength || ev3_button_is_pressed(DOWN_BUTTON)) {
 			fprintf(fp, "timeAve = %f\n", timeAve);
 			fprintf(fp, "timeSum = %d\n", timeSum);
 			fprintf(fp, "nowtime = %d\n", nowtime);
