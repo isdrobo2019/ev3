@@ -3,8 +3,10 @@
 #include <stdarg.h>
 
 #define SATURATION_THRESHOLD 80.0
+#define SATURATION_MARGIN 15.0
 #define VALUE_THRESHOLD 80.0
 
+double SATURATION_MIN = 20.0;
 // 演習用のユーティリティ
 
 // 初期処理用
@@ -33,11 +35,11 @@ void msg(int32_t line, char* format, char* args, ...) {
   msg_f(str, line);
 }
 
-double getMax(int len, double val, ...) {
+double getMax(int len, ...) {
     int i;
     double _max, num;
     va_list ap;
-    va_start(ap, val);
+    va_start(ap, len);
 
     _max = va_arg(ap, double);
     for (i = 1; i < len; i++) {
@@ -49,18 +51,27 @@ double getMax(int len, double val, ...) {
     return _max;
 }
 
-double getMin(int len, double val, ...) {
+double getMin(int len, ...) {
     int i;
     double _min, num;
     va_list ap;
-    va_start(ap, val);
+    va_start(ap, len);
+    FILE *tmpfp;
 
+    if(len == 4) {
+      tmpfp = fopen("getmin_test.log","w");
+    fprintf(tmpfp, "len = %d\n", len);
+    }
     _min = va_arg(ap, double);
+    if(len == 4) fprintf(tmpfp, "val[0] = %f\n\n", _min);
+    
     for (i = 1; i < len; i++) {
         num = va_arg(ap, double);
+        if(len == 4) fprintf(tmpfp, "val[%d] = %f\n", i, num);
         if (num < _min)
             _min = num;
     }
+    if(len == 4) fclose(tmpfp);
     va_end(ap);
     return _min;
 }
@@ -72,12 +83,13 @@ colorid_t rawColortoColorNumber(rgb_raw_t source, double* rgbCoef, double* redHS
   double H, S, V;
 char str[64];
 			snprintf(str,64,"RGB :[%3u, %3u, %3u]", source.r, source.g, source.b);
-			ev3_lcd_draw_string(str,0,100);
+			//ev3_lcd_draw_string(str,0,100);
 			snprintf(str,64,"realRGB :[%3.2f, %3.2f, %3.2f]",realR, realG, realB);
-			ev3_lcd_draw_string(str,0,110);
+			//ev3_lcd_draw_string(str,0,110);
   rgb2hsv(realR, realG, realB, &H, &S, &V);
 
-  HSVtoColorNumber2(H, S, V, redHSV, yellowHSV, greenHSV, blueHSV);
+  //HSVtoColorNumber2(H, S, V, redHSV, yellowHSV, greenHSV, blueHSV);
+  HSVtoColorNumber(H, S, V);
 }
 
 void rawColortoHSV(rgb_raw_t source, double* rgbCoef, double *HSV) {
@@ -152,21 +164,35 @@ void normalizeRGB(rgb_raw_t source, double* rgbCoef) {
 
 }
 
+void SaturationMin(double* redHSV, double* yellowHSV, double* greenHSV, double* blueHSV) {
+
+
+  SATURATION_MIN = getMin(4, redHSV[1], yellowHSV[1], greenHSV[1], blueHSV[1]) - SATURATION_MARGIN;
+if(SATURATION_MIN < 0.0) SATURATION_MIN = 0.0;
+
+      char str[64];
+			snprintf(str,64,"smin = %3.2f",SATURATION_MIN);
+			ev3_lcd_draw_string(str,0,10);
+
+}
+
 colorid_t HSVtoColorNumber(double h, double s, double v) {
 
 char str[64];
 			snprintf(str,64,"hsv :[%3.2f, %3.2f, %3.2f]",h, s, v);
 			ev3_lcd_draw_string(str,0,120);
 
-  if(s < SATURATION_THRESHOLD) {
-    if(v > VALUE_THRESHOLD) {
-      return COLOR_WHITE;
-    } else {
-      return COLOR_BLACK;
-    }
+  // if(s < SATURATION_THRESHOLD) {
+  if(s < SATURATION_MIN) {
+      return COLOR_NONE;
+    // if(v > VALUE_THRESHOLD) {
+    //   return COLOR_NONE;
+    // } else {
+    //   return COLOR_NONE;
+    // }
   }
 
-  return COLOR_NONE;
+  return COLOR_RED;
 }
 
 colorid_t HSVtoColorNumber2(double h, double s, double v, double* redHSV, double* yellowHSV, double* greenHSV, double* blueHSV) {

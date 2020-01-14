@@ -44,19 +44,18 @@ private:
 	float RdeltaD[15] = {D1, D2, D1, D2, D2, D3, D2, D1, D2, D2, D2, D1, D1, D1, D1};
 	float RdeltaI[15] = {I1, I2, I1, I2, I2, I2, I2, I1, I2, I1, I2, I1, I1, I2, I2};
 	
-	//LÉRÅ[ÉX
+	//LÔøΩRÔøΩ[ÔøΩX
 	//float LdeltaP[15] = {0.4, 0.8, 0.4, 0.7, 0.9, 0.9, 0.7, 0.4, 0.8, 0.4, 0.9, 0.4, 0.6, 0.8, 0.4};
 	//float LdeltaI[15] = {strI, curI, strI, curI, curI, curI, curI, strI, curI, strI, curI, strI, strI, curI, curI};
 	//float LdeltaD[15] = {0, 0.01, 0, 0.01, 0.03, 0.02, 0.01, 0, 0.01, 0, 0.02, 0, 0, 0, 0};
 
-	//RÉRÅ[ÉX
+	//RÔøΩRÔøΩ[ÔøΩX
 	//float RdeltaP[15] = {0.4, 0.7, 0.4, 0.7, 0.9, 0, 0.9, 0.2, 0.4, 0.7, 0.9, 0.4, 0.6, 0.8, 0.4};
 	//float RdeltaI[15] = {strI, curI, strI, curI, curI, 0, curI, 0.2 , 0.2, curI, curI, strI, strI, curI, curI};
 	//float RdeltaD[15] = {0, 0.01, 0, 0.01, 0.03, 0, 0.02, 0, 0, 0.01, 0.02, 0, 0, 0, 0};
 
 	float S1 = 45;
 	float S2 = 25;
-	
 	
 	float speed[15] = {S1, S1, S1, S1, S1, S1, S1, S1, S1, S1, S1, S1, S2, S2, S2};
 	

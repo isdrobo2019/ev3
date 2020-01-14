@@ -1,6 +1,7 @@
 import time
 import cv2
 import numpy as np
+from capture import Capture
 
 class mouseParam:
     def __init__(self, input_img_name):
@@ -40,38 +41,11 @@ class mouseParam:
     #xとyの座標を返す関数
     def getPos(self):
         return (self.mouseEvent["x"], self.mouseEvent["y"])
-        
-
-# Raspberry Pi3（カメラシステム）のURL
-url = "http://192.168.11.100/?action=stream"
-
-# VideoCaptureのインスタンスを作成する。
-cap = cv2.VideoCapture(url) # カメラシステムを使う場合
-
-# カメラFPSを30FPSに設定
-cap.set(cv2.CAP_PROP_FPS, 30)
-
-# カメラ画像の横幅を1280に設定
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-
-# カメラ画像の縦幅を720に設定
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
-# ピクセル配列をゼロ初期化
-img = np.zeros((720, 1280, 3), dtype=np.uint8)
-
-if cap.isOpened():
-    # 画像をキャプチャ
-    ret, img = cap.read()
-        
-    # 画像をpngファイルへ保存(座標の調整用途)
-    cv2.imwrite('calibration.png', img)
-
-# キャプチャ終了
-cap.release()
 
 filename = "calibration.png"
-# filename = "image.png"
+# 画像キャプチャ（キャリブレーション時）
+Capture.image_capture(filename)
+
 if __name__ == "__main__":
     
     while 1:
@@ -132,32 +106,20 @@ if __name__ == "__main__":
                 sorts.insert(rank, point)
             path = 'point_list.txt'
             with open(path, mode='w') as f:
-                f.write(str(sorts[1][0]) + "," + str(sorts[1][1]))
+                f.write(str(points[0][0]) + "," + str(points[0][1]))
                 f.write("\n")
-                f.write(str(sorts[2][0]) + "," + str(sorts[2][1]))
+                f.write(str(points[1][0]) + "," + str(points[1][1]))
                 f.write("\n")
-                f.write(str(sorts[3][0]) + "," + str(sorts[3][1]))
+                f.write(str(points[2][0]) + "," + str(points[2][1]))
                 f.write("\n")
-                f.write(str(sorts[0][0]) + "," + str(sorts[0][1]))
-
-            # lf = ""
-            # with open(path, mode='w') as f:
-            #     for point in points:
-            #         f.write(lf)
-            #         f.write(str(point[0]) + "," + str(point[1]))
-            #         lf = "\n"
+                f.write(str(points[3][0]) + "," + str(points[3][1]))
 
             cv2.destroyAllWindows()            
             print("Complete")
             
             # 画像の読み込み
             img = org.copy()
-            # cv2.imshow(windowname, img)
-
-            # 白黒画像で画像を読み込み
-            # gray = cv2.imread(filename_before,0)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
 
             ret,th1 = cv2.threshold(gray,130,255,cv2.THRESH_BINARY)
 
@@ -172,7 +134,7 @@ if __name__ == "__main__":
                 for line in lines:
                     sp = line.split(",")
                     ptss.append([int(sp[0]), int(sp[1])])
-            pts1 = np.float32([ptss[1],ptss[3],ptss[0],ptss[2]])
+            pts1 = np.float32([ptss[0],ptss[1],ptss[2],ptss[3]])
 
             pts2 = np.float32([[600,300],[600,0],[0,0],[0,300]])
 
@@ -189,7 +151,10 @@ if __name__ == "__main__":
             # 第三引数：変更後の高さ
             resized_img = cv2.resize(dst,(width*1, height*2))
 
-            cv2.imshow("change", resized_img)
+            # 画像をPNGファイルへ保存(調整用途)
+            cv2.imwrite(filename, resized_img)
+            
+            cv2.imshow("transform", resized_img)
             key = cv2.waitKey()
             if key != 27:
                 cv2.destroyAllWindows()

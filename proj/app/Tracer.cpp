@@ -39,9 +39,9 @@ void Tracer::run(int target, int mode) {
 	float	Ki = 0;
 	float	Kd = 0.1;
 	
-	float* deltaP;
-	float* deltaI;
-	float* deltaD;
+	// float* deltaP;
+	// float* deltaI;
+	// float* deltaD;
 	
 	float p = 0;
 	float i = 0;
@@ -58,7 +58,7 @@ void Tracer::run(int target, int mode) {
 //		deltaD = LdeltaD;
 //	}
 
-	if(mode <= sizeof(RdeltaP) / sizeof(int)) {
+	if(mode <= sizeof(speed) / sizeof(int)) {
 		Kp = deltaP[mode];
 		Ki = deltaI[mode];
 		Kd = deltaD[mode];

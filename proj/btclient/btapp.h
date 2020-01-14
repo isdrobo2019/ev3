@@ -275,8 +275,8 @@ void btmain(intptr_t unused)
 
 	// タッチセンサ押下待ち
 	lcd_print("Press the touch sensor.\n");
-    while(!ev3_touch_sensor_is_pressed((sensor_port_t)TOUCH_SENSOR_PORT));
-    while(ev3_touch_sensor_is_pressed((sensor_port_t)TOUCH_SENSOR_PORT));
+    // while(!ev3_touch_sensor_is_pressed((sensor_port_t)TOUCH_SENSOR_PORT));
+    // while(ev3_touch_sensor_is_pressed((sensor_port_t)TOUCH_SENSOR_PORT));
 
 	// 色判定リクエストメッセージを生成
 	request_len = encode_packet(eSpecific, points, sizeof(points)/sizeof(points[0]), &request); /* 座標IDを指定する場合 */
