@@ -24,6 +24,12 @@ extern int balancingAdvanceChk(float distance, int balancing, int pwm);
 extern int balancingAdvanceChk2(float distance, int balancing, int pwm, float pwmRate);
 extern int rotationChk(float angle);
 
+extern float pidtest_sensor[100];
+extern float pidtest_p[100];
+extern float pidtest_i[100];
+extern float pidtest_d[100];
+
+
 #endif /* TOPPERS_MACRO_ONLY */
 
 #ifdef __cplusplus

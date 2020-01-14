@@ -27,6 +27,14 @@ Clock clock;
 Motor leftWheel(PORT_C);
 Motor rightWheel(PORT_B);
 
+//pid値確認用
+FILE *fp;
+float pidtest_sensor[100] = {0};
+float pidtest_p[100] = {0};
+float pidtest_i[100] = {0};
+float pidtest_d[100] = {0};
+
+
 // リフレクトセンサ・白
 int light_white = 0;
 
@@ -38,10 +46,11 @@ int light_target = 0;
 int first_target = 0;
 
 float tracer_cm[15] = {55, 75, 50, 80, 90, 95, 115, 80, 80, 20, 170, 60, 140, 70, 10};
-float reserve_cm[15] = {55, 75, 50, 80, 115, 0, 110, 30, 25, 107, 150, 20, 170, 70, 10};
+
+float reserve_cm[15] = {10, 0, 15, 80, 115, 0, 110, 30, 25, 107, 150, 20, 170, 70, 10};
 
 int mode = 0;
-int pwm = 40;//50;
+int pwm = 25;//50;
 int inside_pwm = 20;//25;
 
 // カラーセンサ・白
@@ -58,7 +67,8 @@ int flg = 1;
 
 int counting = 0;
 void reserve_cyc(intptr_t exinf) {
-
+	
+/*
 	timecount += 4;
 	if(mode == 5){
 		//回転
@@ -97,7 +107,7 @@ void reserve_cyc(intptr_t exinf) {
 		ev3_speaker_play_tone(300,30);
 		wup_tsk(MAIN_TASK);
 	}
-
+*/
 	ext_tsk();
 }
 
@@ -124,7 +134,13 @@ void tracer_cyc(intptr_t exinf) {
 		ev3_speaker_play_tone(300,30);
 		wup_tsk(MAIN_TASK);         // 左ボタン押下でメインを起こす
 	}
-	
+
+
+/*
+	if(dateCnt >= 99) {
+		wup_tsk(MAIN_TASK);
+	}
+*/
 	ext_tsk();
 }
 
@@ -195,22 +211,35 @@ char courseLR;
 	clock.sleep(200);
 
 	
-	// //走行開始
-	// if(course== 'R'){
-	// 	//ライントレース(回転)
-	// 	ev3_sta_cyc(RESERVE_CYC);
-	// 	slp_tsk();
-	// 	ev3_stp_cyc(RESERVE_CYC);
-	// } else {
-	// 	//ライントレース
-	// 	ev3_sta_cyc(TRACER_CYC);
-	// 	slp_tsk();
-	// 	ev3_stp_cyc(TRACER_CYC);
-	// }
+	//走行開始
+//	if(course== 'L'){
+//		//ライントレース(回転)
+//		ev3_sta_cyc(RESERVE_CYC);
+//		slp_tsk();
+//		ev3_stp_cyc(RESERVE_CYC);
+//	} else {
+	 	//ライントレース
+	 	ev3_sta_cyc(TRACER_CYC);
+	 	slp_tsk();
+	 	ev3_stp_cyc(TRACER_CYC);
+//	}
+
+/*/pid値確認用
+	if((fp = fopen("test.csv","w")) != NULL) {
+		
+		fprintf(fp,"%s,%s,%s,%s\n","sensor", "p", "i", "d");
+		
+		for(int i = 0; i < 100; i++) {
+			
+			fprintf(fp,"%f,%f,%f,%f\n",pidtest_sensor[i], pidtest_p[i], pidtest_i[i], pidtest_d[i]);
+		}
+		fclose(fp);
+	}
+*/
 
 //走行終了
-//tracer.terminate();
-// slp_tsk();
+tracer.terminate();
+slp_tsk();
 
   // ブロックビンゴ仮
   //float constvaltest = WIDTH_RADIUS;
