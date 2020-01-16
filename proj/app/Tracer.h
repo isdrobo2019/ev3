@@ -23,7 +23,8 @@ private:
 	char select;
 	char select2;
 	float	integral;
-	
+	char lineBlock;
+
 	//float strI = 0.7;
 	//float curI = 0.2;
 	

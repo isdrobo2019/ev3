@@ -65,38 +65,40 @@ rgb_raw_t stageBlue;
         break;      
         case 1:
           ev3_speaker_play_tone(100,30);
+          ev3_speaker_play_tone(150,30);
     			light_white = colorSensor.getBrightness();
     			light_target = (light_black + light_white) / 2;
-    			clock.sleep(500);
-        break;      
-        case 2:
-          ev3_speaker_play_tone(100,30);
     			colorSensor.getRawColor(stageWhite);
-				normalizeRGB(stageWhite, rgbCoef);
     			clock.sleep(500);
         break;      
-		case 3:
+        // case 2:
+        //   ev3_speaker_play_tone(100,30);
+    	// 		colorSensor.getRawColor(stageWhite);
+		// 		normalizeRGB(stageWhite, rgbCoef);
+    	// 		clock.sleep(500);
+        // break;      
+		case 2://3:
 		//R
           ev3_speaker_play_tone(300,30);
 			colorSensor.getRawColor(stageRed);
 				rawColortoHSV(stageRed, rgbCoef, redHSV);
     			clock.sleep(500);
 		break;
-		case 4:
+		case 3://4:
 		//Y
           ev3_speaker_play_tone(300,30);
 			colorSensor.getRawColor(stageYellow);
 				rawColortoHSV(stageYellow, rgbCoef, yellowHSV);
     			clock.sleep(500);
 		break;
-		case 5:
+		case 4://5:
 		//G
           ev3_speaker_play_tone(300,30);
 			colorSensor.getRawColor(stageGreen);
 				rawColortoHSV(stageGreen, rgbCoef, greenHSV);
     			clock.sleep(500);
 		break;
-		case 6:
+		case 5://6:
 		//B
           ev3_speaker_play_tone(300,30);
 			colorSensor.getRawColor(stageBlue);
@@ -106,7 +108,7 @@ rgb_raw_t stageBlue;
       }
       calibrationMode++;
     }
-    if(calibrationMode == 8) break;
+    if(calibrationMode == 7) break; //8) break;
     if (ev3_button_is_pressed(LEFT_BUTTON)) {
       calibrationMode = 0;
       light_black = -1;
@@ -146,12 +148,16 @@ rgb_raw_t stageBlue;
 		case 1:
 			snprintf(str,64,"black :[%d]",light_black);
 			//ev3_lcd_draw_string(str,0,10);
-		case 2:
+		// case 2:
+		// 	snprintf(str,64,"white :[%d]",light_white);
+		// 	//ev3_lcd_draw_string(str,0,20);
+		// 	snprintf(str,64,"target:[%d]",light_target);
+		// 	//ev3_lcd_draw_string(str,0,30);
+		case 2://3:
 			snprintf(str,64,"white :[%d]",light_white);
 			//ev3_lcd_draw_string(str,0,20);
 			snprintf(str,64,"target:[%d]",light_target);
 			//ev3_lcd_draw_string(str,0,30);
-		case 3:
 			snprintf(str,64,"r     :[%u]",stageWhite.r);
 			ev3_lcd_draw_string(str,0,40);
 			snprintf(str,64,"g     :[%u]",stageWhite.g);
@@ -166,19 +172,19 @@ rgb_raw_t stageBlue;
 			// snprintf(str,64,"bCoef :[%f]",rgbCoef[2]);
 			// ev3_lcd_draw_string(str,0,90);
 			break;
-			case 4:
+			case 3://4:
 			snprintf(str,64,"redHSV :[%3.1f, %3.1f, %3.1f]", redHSV[0], redHSV[1], redHSV[2]);
 			ev3_lcd_draw_string(str,0,70);
 			break;
-			case 5:
+			case 4://5:
 			snprintf(str,64,"yellowHSV :[%3.1f, %3.1f, %3.1f]", yellowHSV[0], yellowHSV[1], yellowHSV[2]);
 			ev3_lcd_draw_string(str,0,80);
 			break;
-			case 6:
+			case 5://6:
 			snprintf(str,64,"greenHSV :[%3.1f, %3.1f, %3.1f]", greenHSV[0], greenHSV[1], greenHSV[2]);
 			ev3_lcd_draw_string(str,0,90);
 			break;
-			case 7:
+			case 6://7:
 			snprintf(str,64,"blueHSV :[%3.1f, %3.1f, %3.1f]", blueHSV[0], blueHSV[1], blueHSV[2]);
 			ev3_lcd_draw_string(str,0,100);
 			break;

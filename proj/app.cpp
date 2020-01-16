@@ -1,6 +1,6 @@
 ﻿// tag::tracer_def[]
 int timecount = 0;
-int* btway;
+int* btway = nullptr;
 int btcount;
 #include "const.h"
 #include "app.h"
@@ -151,7 +151,15 @@ void tracer_cyc(intptr_t exinf) {
 
 void main_task(intptr_t unused) {
 
+// bluetoothをtrue: 使用する false: 使用しない（手動で用意する）
 bool usebt = false;
+
+// 結合変数(以下のビットフラグの使用)
+// 0x01 ライントレース
+// 0x02 ブロックビンゴ以降
+char combine = 3;
+
+
 char courseLR;
 	TouchSensor touchSensor(PORT_1);
 	Motor arm(PORT_A);
@@ -222,9 +230,11 @@ char courseLR;
 	// 	ev3_stp_cyc(RESERVE_CYC);
 	// } else {
 		//ライントレース
-		ev3_sta_cyc(TRACER_CYC);
-		slp_tsk();
-		ev3_stp_cyc(TRACER_CYC);
+		if(combine & 0x01) {
+			ev3_sta_cyc(TRACER_CYC);
+			slp_tsk();
+			ev3_stp_cyc(TRACER_CYC);
+		}
 	// }
 
 /*/pid値確認用
@@ -241,10 +251,11 @@ char courseLR;
 */
 
 
-//走行終了
-tracer.terminate();
-slp_tsk();
-
+if(!(combine & 0x02)) {
+	//走行終了
+	tracer.terminate();
+	slp_tsk();
+}
   // ブロックビンゴ仮
   //float constvaltest = WIDTH_RADIUS;
   // leftWheel.setPWM((Motor::PWM_MAX)/5);
@@ -261,6 +272,7 @@ slp_tsk();
 	//int turning[9] = {4, 0, 4, 0, 2, 0, 0, 4, 0};
 	//int turning_count = 9;
 		
+if(combine & 0x02) {
 	int* turning;// = {2, 5, 5, 5, 5, 5, 5, 5, 5};
 
 	// 受け取る
@@ -272,22 +284,22 @@ slp_tsk();
 		btway = new int[64];
 		if(courseLR == 'L') {
 			btway[0] = S_FRONT;
-			// turning[0] = S_FRONT_RIGHT;
-			// turning[1] = S_RIGHT;
-			// turning[2] = S_LEFT;
-			// turning[3] = S_LEFT;
-			// turning[4] = S_FRONT_LEFT;
+			btway[0] = S_FRONT_RIGHT;
+			btway[1] = S_RIGHT;
+			btway[2] = S_LEFT;
+			btway[3] = S_LEFT;
+			btway[4] = S_FRONT_LEFT;
 
-			// turning[5] = S_FRONT;
-			// turning[6] = S_FRONT_LEFT;
-			// turning[7] = S_FRONT;
-			// turning[8] = S_LEFT;
-			// turning[9] = S_BACK;
+			btway[5] = S_FRONT;
+			btway[6] = S_FRONT_LEFT;
+			btway[7] = S_FRONT;
+			btway[8] = S_LEFT;
+			btway[9] = S_BACK;
 
-			// turning[10] = S_FRONT_RIGHT;
-			// turning[11] = S_FRONT;
-			// turning[12] = S_FRONT_RIGHT;
-			btcount = 1;		
+			btway[10] = S_FRONT_RIGHT;
+			btway[11] = S_FRONT;
+			btway[12] = S_FRONT_RIGHT;
+			btcount = 13;		
 		} else {
 			btway[0] = S_FRONT;
 			btway[1] = S_FRONT;
@@ -340,8 +352,8 @@ slp_tsk();
 	clock.sleep(80);
 	ev3_speaker_play_tone(400,30);
 	clock.sleep(80);
-
-	delete [] btway;
+}
+	if(btway != nullptr) delete [] btway;
 	ext_tsk();
 }
 

@@ -30,23 +30,31 @@ void Tracer::setSelect(char select) {
 	this->select = select;
 }
 
+// char Tracer::getLineBlock() {
+// 	return lineBlock;
+// }
+
+// void Tracer::setLineBlock(char lineBlock) {
+// 	this->lineBlock = lineBlock;
+// }
+
 void Tracer::run(int target, int mode) {
 	
 	char str[64];
 	
 	//ブロックビンゴ時
 	float	Kp = 0.6;
-	float	Ki = 0;
-	float	Kd = 0.1;
+	float	Ki = 0.2;
+	float	Kd = 0.01;
 	
-	// float* deltaP;
-	// float* deltaI;
-	// float* deltaD;
+	float* deltaP;
+	float* deltaI;
+	float* deltaD;
 	
 	float p = 0;
 	float i = 0;
 	float d = 0;
-	int pwm = 30;
+	int pwm = 15;
 	
 //	if(select2 = 'R'){
 		deltaP = RdeltaP;
@@ -65,7 +73,7 @@ void Tracer::run(int target, int mode) {
 		pwm = speed[mode];
 	}
 
-	snprintf(str,64,"P[%f] D[%f] I[%f]", Kp, Kd, Ki);
+	snprintf(str,64,"S[%d] P[%2.1f] D[%2.1f] I[%2.1f]",pwm , Kp, Kd, Ki);
 	ev3_lcd_draw_string(str,0,30);
 	
 /*	if(mode == 4 ){
@@ -83,7 +91,6 @@ void Tracer::run(int target, int mode) {
 	d = Kd * (diff[1] - diff[0]) / 0.004;
 	
 	float turn = p + i + d;
-/*
 	if(pwm < labs(turn)) {
 		if(turn > 0 ){
 			turn = pwm;
@@ -91,7 +98,7 @@ void Tracer::run(int target, int mode) {
 			turn = -pwm;
 		}
 	}
-*/
+/*
 	if(100 <= labs(turn)) {
 		if(turn > 0 ){
 			turn = 100;
@@ -99,7 +106,7 @@ void Tracer::run(int target, int mode) {
 			turn = -100;
 		}
 	}
-	
+*/	
 	if(select == 'L'){
 		turn = -turn;
 	}
