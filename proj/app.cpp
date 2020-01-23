@@ -2,6 +2,21 @@
 int timecount = 0;
 int* btway = nullptr;
 int btcount;
+// bluetoothをtrue: 使用する false: 使用しない（手動で用意する）
+bool usebt = false;
+
+// ボタン待ちをtrue: 使用する false: 使用しない
+bool buttonEnable = false;
+
+// ライントレース区間をtrue: 有効にする false: 有効にしない
+bool lineTraceEnable = false;
+
+// ブロックビンゴ区間をtrue: 有効にする false: 有効にしない
+bool blockBingoEnable = true;
+
+
+bool settingLoaded = false;
+
 #include "const.h"
 #include "app.h"
 #include "target_test.h"
@@ -9,13 +24,15 @@ int btcount;
 #include "Tracer.h"
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #include "TouchSensor.h"
 #include "Clock.h"
 #include "Motor.h"
 using namespace ev3api;
 
-
+#include "app/sakata_init.h"
 #include "app/calibration.h"
 #include "app/blockbingo.h"
 #include "app/garage.h"
@@ -114,13 +131,28 @@ void reserve_cyc(intptr_t exinf) {
 
 // ライントレースタスク
 void tracer_cyc(intptr_t exinf) {
+		// ev3_speaker_set_volume(3);
+
+	if(tracer.getSelect() == 'R') {
+		ev3_speaker_play_tone(200,30);
+	}
 
 	timecount += 4;
 	if(advanceChk(tracer_cm[mode])){
-		ev3_speaker_play_tone(500,30);
+	
+	char modestr[64];
+	snprintf(modestr,64,"mode is %d", mode);
+	ev3_lcd_draw_string(modestr,0,0);
+
 	  	leftWheel.setCount(0);
 	  	rightWheel.setCount(0);
 
+		if(mode <15 && mode >=12) {
+		ev3_speaker_play_tone(1000,30);
+		}
+		else {
+		ev3_speaker_play_tone(500,30);
+		}
 		mode++;
 	}
 	
@@ -136,7 +168,6 @@ void tracer_cyc(intptr_t exinf) {
 		wup_tsk(MAIN_TASK);         // 左ボタン押下でメインを起こす
 	}
 
-
 /*
 	if(dateCnt >= 99) {
 		wup_tsk(MAIN_TASK);
@@ -151,21 +182,26 @@ void tracer_cyc(intptr_t exinf) {
 
 void main_task(intptr_t unused) {
 
-// bluetoothをtrue: 使用する false: 使用しない（手動で用意する）
-bool usebt = false;
+// FILE *pwdfp = fopen("pwd.log", "w");
+// char pwddir[256];
+// getcwd(pwddir, 256);
+// fprintf(pwdfp, "pwd = %s", pwddir);
+// fclose(pwdfp);
 
-// 結合変数(以下のビットフラグの使用)
-// 0x01 ライントレース
-// 0x02 ブロックビンゴ以降
-char combine = 3;
-
+//settingLoad();
 
 char courseLR;
 	TouchSensor touchSensor(PORT_1);
 	Motor arm(PORT_A);
 	ev3_speaker_set_volume(5);
 
-
+	if(settingLoaded) {
+		ev3_speaker_play_tone(500,100);
+		ev3_speaker_play_tone(50,100);
+	} else {
+		ev3_speaker_play_tone(50,100);
+		ev3_speaker_play_tone(500,100);
+	}
 
 	//カラーセンサの角度制御
 	arm.reset();
@@ -230,7 +266,7 @@ char courseLR;
 	// 	ev3_stp_cyc(RESERVE_CYC);
 	// } else {
 		//ライントレース
-		if(combine & 0x01) {
+		if(lineTraceEnable) {
 			ev3_sta_cyc(TRACER_CYC);
 			slp_tsk();
 			ev3_stp_cyc(TRACER_CYC);
@@ -251,7 +287,7 @@ char courseLR;
 */
 
 
-if(!(combine & 0x02)) {
+if(!blockBingoEnable) {
 	//走行終了
 	tracer.terminate();
 	slp_tsk();
@@ -272,7 +308,7 @@ if(!(combine & 0x02)) {
 	//int turning[9] = {4, 0, 4, 0, 2, 0, 0, 4, 0};
 	//int turning_count = 9;
 		
-if(combine & 0x02) {
+if(blockBingoEnable) {
 	int* turning;// = {2, 5, 5, 5, 5, 5, 5, 5, 5};
 
 	// 受け取る

@@ -102,7 +102,6 @@ void routeLastfix(int* route, int& routeLength) {
 	int sector = 0;
 	int mode = 0;
   bool change = true;
-  bool buttonEnable = true;
 	int turningNow = 0;
 	  int tmpCount = 0;
 

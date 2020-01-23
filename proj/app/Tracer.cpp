@@ -109,6 +109,9 @@ void Tracer::run(int target, int mode) {
 */	
 	if(select == 'L'){
 		turn = -turn;
+
+	} else {
+		ev3_speaker_play_tone(1000,30);
 	}
 	
 	leftWheel.setPWM(pwm - turn);
