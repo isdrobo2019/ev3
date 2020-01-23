@@ -181,6 +181,8 @@ colorid_t HSVtoColorNumber(double h, double s, double v) {
 char str[64];
 			snprintf(str,64,"hsv :[%3.2f, %3.2f, %3.2f]",h, s, v);
 			ev3_lcd_draw_string(str,0,120);
+			snprintf(str,64,"smin %3.2f", SATURATION_MIN);
+			ev3_lcd_draw_string(str,0,130);
 
   // if(s < SATURATION_THRESHOLD) {
   if(s < SATURATION_MIN) {

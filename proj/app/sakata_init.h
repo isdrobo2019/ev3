@@ -16,9 +16,9 @@ bool ynfunc(char *buf) {
 
 void settingLoad() {
 
-	FILE *sfp = fopen("config.txt", "r");
+	FILE *sfp = fopen("config.ini", "r");
 	// 開けない時はデフォルト値
-	if(sfp == nullptr) {
+	if(sfp == NULL) {
 		
 		// 開けたら読み込む
 	} else {
@@ -35,6 +35,9 @@ void settingLoad() {
 		fscanf(sfp, " BlockBingoEnable = %s\n", buf);
 		blockBingoEnable = ynfunc(buf);
 
+		// FILE *readlog = fopen("readresult.log", "w");
+		// fprintf(readlog, "UseBluetooth = %d\n", usebt);
+		// fclose(readlog);
 		settingLoaded = true;
 	}
 

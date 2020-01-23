@@ -69,6 +69,7 @@ rgb_raw_t stageBlue;
     			light_white = colorSensor.getBrightness();
     			light_target = (light_black + light_white) / 2;
     			colorSensor.getRawColor(stageWhite);
+				normalizeRGB(stageWhite, rgbCoef);
     			clock.sleep(500);
         break;      
         // case 2:

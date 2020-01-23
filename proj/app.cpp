@@ -3,13 +3,13 @@ int timecount = 0;
 int* btway = nullptr;
 int btcount;
 // bluetoothをtrue: 使用する false: 使用しない（手動で用意する）
-bool usebt = false;
+bool usebt = true;
 
 // ボタン待ちをtrue: 使用する false: 使用しない
 bool buttonEnable = false;
 
 // ライントレース区間をtrue: 有効にする false: 有効にしない
-bool lineTraceEnable = false;
+bool lineTraceEnable = true;
 
 // ブロックビンゴ区間をtrue: 有効にする false: 有効にしない
 bool blockBingoEnable = true;
@@ -25,7 +25,7 @@ bool settingLoaded = false;
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
+// #include <unistd.h>
 
 #include "TouchSensor.h"
 #include "Clock.h"
@@ -134,7 +134,7 @@ void tracer_cyc(intptr_t exinf) {
 		// ev3_speaker_set_volume(3);
 
 	if(tracer.getSelect() == 'R') {
-		ev3_speaker_play_tone(200,30);
+		// ev3_speaker_play_tone(200,30);
 	}
 
 	timecount += 4;
@@ -188,7 +188,7 @@ void main_task(intptr_t unused) {
 // fprintf(pwdfp, "pwd = %s", pwddir);
 // fclose(pwdfp);
 
-//settingLoad();
+settingLoad();
 
 char courseLR;
 	TouchSensor touchSensor(PORT_1);
