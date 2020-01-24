@@ -44,7 +44,7 @@ void Tracer::run(int target, int mode) {
 	
 	//ブロックビンゴ時
 	float	Kp = 0.6;
-	float	Ki = 0.2;
+	float	Ki = 0.0;
 	float	Kd = 0.01;
 	
 	float* deltaP;

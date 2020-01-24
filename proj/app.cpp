@@ -318,45 +318,70 @@ if(blockBingoEnable) {
 	else {
 		// 経路を手動で用意
 		btway = new int[64];
+		btway[0] = 5;
+		btway[1] = 3;
+		btway[2] = 6;
+		btway[3] = 0;
+		btway[4] = 1;
+		btway[5] = 5;
+		btway[6] = 0;
+		btway[7] = 1;
+		btway[8] = 6;
+		btway[9] = 3;
+		btway[10] = 6;
+		btway[11] = 1;
+		btway[12] = 5;
+		btway[13] = 1;
+		btway[14] = 0;
+		btway[15] = 3;
+		btway[16] = 7;
+		btway[17] = 1;
+		btway[18] = 2;
+		btway[19] = 4;
+		btway[20] = 0;
+		btway[21] = 3;
+		btway[22] = 5;
+		btcount = 23;
 		if(courseLR == 'L') {
-			btway[0] = S_FRONT;
-			btway[0] = S_FRONT_RIGHT;
-			btway[1] = S_RIGHT;
-			btway[2] = S_LEFT;
-			btway[3] = S_LEFT;
-			btway[4] = S_FRONT_LEFT;
+			// btway[0] = S_FRONT;
+			// btway[0] = S_FRONT_RIGHT;
+			// btway[1] = S_RIGHT;
+			// btway[2] = S_LEFT;
+			// btway[3] = S_LEFT;
+			// btway[4] = S_FRONT_LEFT;
 
-			btway[5] = S_FRONT;
-			btway[6] = S_FRONT_LEFT;
-			btway[7] = S_FRONT;
-			btway[8] = S_LEFT;
-			btway[9] = S_BACK;
+			// btway[5] = S_FRONT;
+			// btway[6] = S_FRONT_LEFT;
+			// btway[7] = S_FRONT;
+			// btway[8] = S_LEFT;
+			// btway[9] = S_BACK;
 
-			btway[10] = S_FRONT_RIGHT;
-			btway[11] = S_FRONT;
-			btway[12] = S_FRONT_RIGHT;
-			btcount = 13;		
+			// btway[10] = S_FRONT_RIGHT;
+			// btway[11] = S_FRONT;
+			// btway[12] = S_FRONT_RIGHT;
+
+			//btcount = 13;		
 		} else {
-			btway[0] = S_FRONT;
-			btway[1] = S_FRONT;
-			btway[2] = S_FRONT_LEFT;
-			btway[3] = S_LEFT;
-			btway[4] = S_LEFT;
+			// btway[0] = S_FRONT;
+			// btway[1] = S_FRONT;
+			// btway[2] = S_FRONT_LEFT;
+			// btway[3] = S_LEFT;
+			// btway[4] = S_LEFT;
 
-			btway[5] = S_FRONT_LEFT;
-			btway[6] = S_FRONT;
-			btway[7] = S_LEFT;
-			btway[8] = S_FRONT_LEFT;
-			btway[9] = S_FRONT;
+			// btway[5] = S_FRONT_LEFT;
+			// btway[6] = S_FRONT;
+			// btway[7] = S_LEFT;
+			// btway[8] = S_FRONT_LEFT;
+			// btway[9] = S_FRONT;
 
-			btway[10] = S_FRONT_LEFT;
-			btway[11] = S_FRONT;
-			btway[12] = S_LEFT;
-			btway[13] = S_LEFT;
-			btway[14] = S_FRONT;
+			// btway[10] = S_FRONT_LEFT;
+			// btway[11] = S_FRONT;
+			// btway[12] = S_LEFT;
+			// btway[13] = S_LEFT;
+			// btway[14] = S_FRONT;
 
-			btway[15] = S_FRONT_RIGHT;
-			btcount = 16;		
+			// btway[15] = S_FRONT_RIGHT;
+			// btcount = 16;		
 		}
 	}
 

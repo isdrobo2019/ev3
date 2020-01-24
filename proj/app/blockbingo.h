@@ -172,6 +172,9 @@ fp=fopen("blockbingo_nowpos.log","w");
   // 難所whileループ部分
   while(true) {
 
+	snprintf(str,64,"route :[%d]", turningNow);
+	ev3_lcd_draw_string(str,0,10);
+
 	if(mode == 0) tracer.run(light_grey, 25);//20);
     // モード変わったときにモータのパワーをセットする
     if(change) {
@@ -267,6 +270,12 @@ fp=fopen("blockbingo_nowpos.log","w");
           leftWheel.setPWM(-myMotorPower);
           rightWheel.setPWM(myMotorPower);
 		break;
+		case 13:
+          leftWheel.setCount(0);
+          rightWheel.setCount(0);
+          leftWheel.setPWM(myMotorPower);
+          rightWheel.setPWM(myMotorPower);
+		break;
       }
       change = false;
     }
@@ -327,7 +336,8 @@ fp=fopen("blockbingo_nowpos.log","w");
 		case S_FRONT_RIGHT:
 		angle = nowRoute[turningNow]==S_RIGHT? 90: 45;
 		//if(blockSetPhase==3) angle *= -1;
-		if(tracer.getSelect()=='L' && nowRoute[turningNow]==S_RIGHT) angle += ANGLE_ASSIST;
+		// if(tracer.getSelect()=='L' && nowRoute[turningNow]==S_RIGHT) angle += ANGLE_ASSIST;
+		if(nowRoute[turningNow]==S_RIGHT) angle += ANGLE_ASSIST;
         if(monoWheelRotChk(angle, 1) == 1) {
           ev3_speaker_play_tone(300,30);
           //mode = 0;
@@ -383,7 +393,8 @@ fp=fopen("blockbingo_nowpos.log","w");
 		angle = nowRoute[turningNow]==S_FRONT_LEFT? 45: 90;
 		//if(blockSetPhase==3) angle *= -1;
 
-		if(tracer.getSelect()=='R' && nowRoute[turningNow]!=S_FRONT_LEFT) angle += ANGLE_ASSIST;
+		// if(tracer.getSelect()=='R' && nowRoute[turningNow]!=S_FRONT_LEFT) angle += ANGLE_ASSIST;
+		if(nowRoute[turningNow]!=S_FRONT_LEFT) angle += ANGLE_ASSIST;
         if(monoWheelRotChk(angle, 0) == 1) {
           ev3_speaker_play_tone(300,30);
           //mode = 0;
@@ -479,6 +490,9 @@ fp=fopen("blockbingo_nowpos.log","w");
 				case S_BACK_RIGHT:
 					//angle = (tracer.getSelect()=='L')? 35: 55;
 					angle = 180;
+					if(tracer.getSelect()=='L') angle += ANGLE_ASSIST;
+					else if(nowRoute[turningNow + 1] == S_LEFT) angle += ANGLE_ASSIST;
+					else if(nowRoute[turningNow + 1] == S_RIGHT) angle -= ANGLE_ASSIST;
 					if(monoWheelRotChk(angle, 1) == 1) {
 			          ev3_speaker_play_tone(800,30);
 						turningNow++;// = (turningNow + 1) % routeLength;
@@ -489,6 +503,9 @@ fp=fopen("blockbingo_nowpos.log","w");
 				case S_BACK_LEFT:
 					//angle = (tracer.getSelect()=='L')? 35: 55;
 					angle = 180;
+					if(tracer.getSelect()=='R') angle += ANGLE_ASSIST;
+					else if(nowRoute[turningNow + 1] == S_RIGHT) angle += ANGLE_ASSIST;
+					else if(nowRoute[turningNow + 1] == S_LEFT) angle -= ANGLE_ASSIST;
 					if(monoWheelRotChk(angle, 0) == 1) {
 			          ev3_speaker_play_tone(800,30);
 						turningNow++;// = (turningNow + 1) % routeLength;
@@ -501,7 +518,8 @@ fp=fopen("blockbingo_nowpos.log","w");
 	  break;
 	  // 180用若干前進
 	  case 11:
-		if(balancingAdvanceChk(2.5, 1, myMotorPower) == 1) {
+		// if(balancingAdvanceChk(2.5, 1, myMotorPower) == 1) {
+		if(balancingAdvanceChk(5.0, 1, myMotorPower) == 1) {
           ev3_speaker_play_tone(400,30);
 			mode = 12;
           change = true;
@@ -514,13 +532,20 @@ fp=fopen("blockbingo_nowpos.log","w");
 			if(balancingAdvanceChk2(distance, 2, myMotorPower / 4 * 3, 1.25f) == 1) {
 				fprintf(fp, "case 1 case 4(曲がり)\n");
 				fprintf(fp, "st now = (%d, %d) ,dir = (%d, %d)\n", nowx, nowy, dirx, diry);
-				mode = 0;
+				mode = 13;
 				if(tracer.getSelect()=='L') tracer.setSelect('R');
 				else tracer.setSelect('L');
 				rotDir(&dirx, &diry, nowRoute[turningNow]);
 				turningNow++;// = (turningNow + 1) % routeLength;
 				fprintf(fp, "en now = (%d, %d) ,dir = (%d, %d)\n", nowx, nowy, dirx, diry);
 			}
+	  break;
+	  case 13:
+		if(balancingAdvanceChk(2.5, 1, myMotorPower) == 1) {
+          ev3_speaker_play_tone(400,30);
+			mode = 0;
+          change = true;
+		}
 	  break;
     }
     clock.sleep(4);

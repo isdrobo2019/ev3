@@ -4,7 +4,7 @@
 
 #define GREYLEVEL 0.5f
 
-#define ANGLE_ASSIST 10
+#define ANGLE_ASSIST 15
 
 #define S_FRONT 0
 #define S_RIGHT 1

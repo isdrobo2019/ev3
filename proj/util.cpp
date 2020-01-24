@@ -3,7 +3,7 @@
 #include <stdarg.h>
 
 #define SATURATION_THRESHOLD 80.0
-#define SATURATION_MARGIN 15.0
+#define SATURATION_MARGIN 10.0
 #define VALUE_THRESHOLD 80.0
 
 double SATURATION_MIN = 20.0;
