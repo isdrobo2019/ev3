@@ -54,7 +54,7 @@ void Tracer::run(int target, int mode) {
 	float p = 0;
 	float i = 0;
 	float d = 0;
-	int pwm = 15;
+	int pwm = 20;
 	
 //	if(select2 = 'R'){
 		deltaP = RdeltaP;

@@ -185,7 +185,7 @@ char str[64];
 			ev3_lcd_draw_string(str,0,130);
 
   // if(s < SATURATION_THRESHOLD) {
-  if(s < SATURATION_MIN) {
+  if(s < SATURATION_MIN || v < 20.0f) {
       return COLOR_NONE;
     // if(v > VALUE_THRESHOLD) {
     //   return COLOR_NONE;
