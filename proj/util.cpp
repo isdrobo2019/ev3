@@ -4,9 +4,12 @@
 
 #define SATURATION_THRESHOLD 80.0
 #define SATURATION_MARGIN 10.0
+#define VALUE_MARGIN 10.0
 #define VALUE_THRESHOLD 80.0
 
 double SATURATION_MIN = 20.0;
+double VALUE_MIN = 20.0;
+double VALUE_MAX = 100.0;
 // 演習用のユーティリティ
 
 // 初期処理用
@@ -170,6 +173,12 @@ void SaturationMin(double* redHSV, double* yellowHSV, double* greenHSV, double* 
   SATURATION_MIN = getMin(4, redHSV[1], yellowHSV[1], greenHSV[1], blueHSV[1]) - SATURATION_MARGIN;
 if(SATURATION_MIN < 0.0) SATURATION_MIN = 0.0;
 
+  VALUE_MIN = getMin(4, redHSV[2], yellowHSV[2], greenHSV[2], blueHSV[2]) - VALUE_MARGIN;
+if(VALUE_MIN < 0.0) VALUE_MIN = 0.0;
+
+  VALUE_MAX = getMax(4, redHSV[2], yellowHSV[2], greenHSV[2], blueHSV[2]) + VALUE_MARGIN;
+if(VALUE_MAX > 100.0) VALUE_MAX = 100.0;
+
       char str[64];
 			snprintf(str,64,"smin = %3.2f",SATURATION_MIN);
 			ev3_lcd_draw_string(str,0,10);
@@ -185,7 +194,8 @@ char str[64];
 			ev3_lcd_draw_string(str,0,130);
 
   // if(s < SATURATION_THRESHOLD) {
-  if(s < SATURATION_MIN || v < 20.0f) {
+  // if(s < SATURATION_MIN || v < 20.0f) {
+  if(s < SATURATION_MIN || v < VALUE_MIN  || v > VALUE_MAX) {
       return COLOR_NONE;
     // if(v > VALUE_THRESHOLD) {
     //   return COLOR_NONE;

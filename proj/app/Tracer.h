@@ -58,7 +58,7 @@ private:
 	float S1 = 45;
 	float S2 = 25;
 	
-	float speed[15] = {S1, S1, S1, S1, S1, S1, S1, S1, S1, S1, S1, S1, S2, S2, S2};
+	float speed[15] = {S1, S1, S1, S1, S1, S1, 40, 40, S1, S1, S1, S1, S2, S2, S2};
 	
 	Motor leftWheel;
 	Motor rightWheel;

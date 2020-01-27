@@ -490,9 +490,9 @@ fp=fopen("blockbingo_nowpos.log","w");
 				case S_BACK_RIGHT:
 					//angle = (tracer.getSelect()=='L')? 35: 55;
 					angle = 180;
-					if(tracer.getSelect()=='L') angle += ANGLE_ASSIST;
-					else if(nowRoute[turningNow + 1] == S_LEFT) angle += ANGLE_ASSIST;
-					else if(nowRoute[turningNow + 1] == S_RIGHT) angle -= ANGLE_ASSIST;
+					//if(tracer.getSelect()=='L') angle += ANGLE_ASSIST;
+					if(nowRoute[turningNow + 1] == S_LEFT) angle += ANGLE_ASSIST;
+					if(nowRoute[turningNow + 1] == S_RIGHT) angle -= ANGLE_ASSIST;
 					if(monoWheelRotChk(angle, 1) == 1) {
 			          ev3_speaker_play_tone(800,30);
 						turningNow++;// = (turningNow + 1) % routeLength;
@@ -503,9 +503,9 @@ fp=fopen("blockbingo_nowpos.log","w");
 				case S_BACK_LEFT:
 					//angle = (tracer.getSelect()=='L')? 35: 55;
 					angle = 180;
-					if(tracer.getSelect()=='R') angle += ANGLE_ASSIST;
-					else if(nowRoute[turningNow + 1] == S_RIGHT) angle += ANGLE_ASSIST;
-					else if(nowRoute[turningNow + 1] == S_LEFT) angle -= ANGLE_ASSIST;
+					// if(tracer.getSelect()=='R') angle += ANGLE_ASSIST;
+					if(nowRoute[turningNow + 1] == S_RIGHT) angle += ANGLE_ASSIST;
+					if(nowRoute[turningNow + 1] == S_LEFT) angle -= ANGLE_ASSIST;
 					if(monoWheelRotChk(angle, 0) == 1) {
 			          ev3_speaker_play_tone(800,30);
 						turningNow++;// = (turningNow + 1) % routeLength;
@@ -555,7 +555,7 @@ fp=fopen("blockbingo_nowpos.log","w");
 		float timeAve = (float)timeSum / (float)nowtime;
 		goGarage(toGarage, toGarageLength, nowx, nowy, goalx, goaly, dirx, diry);
 		// 115
-		if(toGarageLength * timeAve + clock.now() >= 1000 * 115 || turningNow == routeLength || ev3_button_is_pressed(DOWN_BUTTON)) {
+		if(toGarageLength * timeAve + clock.now() >= 1000 * 110 || turningNow == routeLength || ev3_button_is_pressed(DOWN_BUTTON)) {
 			fprintf(fp, "timeAve = %f\n", timeAve);
 			fprintf(fp, "timeSum = %d\n", timeSum);
 			fprintf(fp, "nowtime = %d\n", nowtime);

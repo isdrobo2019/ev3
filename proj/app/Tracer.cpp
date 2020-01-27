@@ -91,6 +91,16 @@ void Tracer::run(int target, int mode) {
 	d = Kd * (diff[1] - diff[0]) / 0.004;
 	
 	float turn = p + i + d;
+
+if(mode <= sizeof(speed) / sizeof(int) -2 ) {
+	if((100 - pwm) <= labs(turn)) {
+		if(turn > 0 ){
+			turn = (100 - pwm);
+		} else {
+			turn = (-100 + pwm);
+		}
+	}
+} else {
 	if(pwm < labs(turn)) {
 		if(turn > 0 ){
 			turn = pwm;
@@ -98,6 +108,7 @@ void Tracer::run(int target, int mode) {
 			turn = -pwm;
 		}
 	}
+}
 /*
 	if(100 <= labs(turn)) {
 		if(turn > 0 ){
@@ -107,6 +118,7 @@ void Tracer::run(int target, int mode) {
 		}
 	}
 */	
+
 	if(select == 'L'){
 		turn = -turn;
 
